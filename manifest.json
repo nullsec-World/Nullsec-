@@ -1,0 +1,16 @@
+{
+  "name": "#NULLSEC SECURE P2P",
+  "short_name": "NULLSEC",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#010308",
+  "theme_color": "#050811",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/512/00ff88/000000?text=NULLSEC",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
