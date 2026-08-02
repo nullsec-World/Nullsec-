@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- ZERO STORAGE & FAST CACHE POLICY -->
+    <!-- ZERO STORAGE POLICY -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>#NULLSEC • Instant Ultra P2P Terminal</title>
+    <title>#NULLSEC • Hyper-Speed P2P Terminal</title>
     
     <!-- Frameworks -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
-        /* ==========================================================================
-           HYPER-CYBERPUNK NEON DESIGN SYSTEM
-           ========================================================================== */
         :root {
             --bg-dark: #020617;
             --panel-bg: rgba(15, 23, 42, 0.85);
@@ -118,6 +115,44 @@
             0% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.2; transform: scale(0.7); }
             100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* NEUER DYNAMISCHER LADEBALKEN OBEN */
+        .progress-container {
+            width: 100%;
+            background: rgba(2, 6, 23, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .progress-text {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--neon-green);
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 255, 204, 0.2);
+        }
+
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
+            box-shadow: 0 0 12px var(--neon-green);
+            transition: width 0.1s linear;
         }
 
         .card {
@@ -293,9 +328,7 @@
             background: transparent;
         }
 
-        /* ==========================================================================
-           WHATSAPP-STYLE FULLSCREEN CALL OVERLAY
-           ========================================================================== */
+        /* WHATSAPP-STYLE VOLLBILD OVERLAY */
         .call-overlay {
             position: fixed;
             top: 0;
@@ -421,15 +454,25 @@
 </head>
 <body>
 
-    <!-- MAIN TERMINAL APP -->
     <div class="app-container">
         <header class="app-header">
             <div class="brand-title">#NULLSEC</div>
-            <div class="status-badge">
+            <div class="status-badge" id="statusBadge">
                 <div class="pulse-dot"></div>
-                INSTANT P2P
+                STANDBY
             </div>
         </header>
+
+        <!-- LADEBALKEN (5 SEKUNDEN TIMER) -->
+        <div class="progress-container">
+            <div class="progress-text">
+                <span id="progressLabel">STATUS: BEREIT</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBarFill"></div>
+            </div>
+        </div>
 
         <!-- CODE GENERATOR -->
         <div class="card">
@@ -449,11 +492,11 @@
             <div class="card-title">BLITZ-VERBINDUNG</div>
             <div class="input-group">
                 <input type="text" id="targetPeerId" placeholder="6-Stelligen Code eingeben..." maxlength="6">
-                <button class="btn" onclick="connectToPeer()">VERBINDEN</button>
+                <button class="btn" id="connectBtn" onclick="start5SecConnection()">VERBINDEN</button>
             </div>
         </div>
 
-        <!-- QUICK CALL TRIGGER -->
+        <!-- REALTIME CALL -->
         <div class="card">
             <div class="card-title">REALTIME ANRUF</div>
             <div class="input-group">
@@ -466,7 +509,7 @@
         <div class="card">
             <div class="card-title">FLÜCHTIGER RAM-CHAT</div>
             <div class="chat-box" id="chatBox">
-                <div class="chat-msg system">System: Ultra-Fast High Priority Direct Tunnel initialisiert.</div>
+                <div class="chat-msg system">System: Gib den Code ein und drücke Verbinden.</div>
             </div>
             <div class="input-group">
                 <input type="text" id="chatInput" placeholder="Nachricht eingeben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
@@ -479,9 +522,7 @@
         </footer>
     </div>
 
-    <!-- ==========================================================================
-       WHATSAPP-STYLE FULLSCREEN VIDEO OVERLAY
-       ========================================================================== -->
+    <!-- FULLSCREEN CALL OVERLAY -->
     <div class="call-overlay" id="callOverlay">
         <div class="remote-video-container">
             <video id="fullscreenRemoteVideo" autoplay playsinline></video>
@@ -503,11 +544,8 @@
         </div>
     </div>
 
-    <!-- ==========================================================================
-       HIGH-SPEED SIGNALING & P2P LOGIC
-       ========================================================================== -->
     <script>
-        // RAM-ONLY MEMORY PROTECTION
+        // ZERO STORAGE PROTOCOL
         try {
             window.localStorage.clear();
             window.sessionStorage.clear();
@@ -525,7 +563,6 @@
         let isAudioMuted = false;
         let isVideoMuted = false;
 
-        // HIGH-SPEED STUN & PEER INITIALIZATION
         function initPeer() {
             if(peer) peer.destroy();
             
@@ -551,23 +588,21 @@
             peer.on('open', (id) => {
                 document.getElementById('myPeerId').innerText = randomCode;
                 generateQRCode(randomCode);
-                logSystem(`Sicherer Tunnel aktiv. ID: ${randomCode}`);
+                logSystem(`Sicherer RAM-Tunnel aktiv. Code: ${randomCode}`);
 
                 if (urlHash && urlHash !== fullId && urlHash.startsWith('nullsec-')) {
                     const targetCode = urlHash.replace('nullsec-', '');
                     document.getElementById('targetPeerId').value = targetCode;
-                    logSystem(`Blitz-Link erkannt! Verbinde zu ${targetCode}...`);
-                    setTimeout(() => connectToPeer(), 100);
+                    start5SecConnection();
                 }
             });
 
             peer.on('connection', (conn) => {
                 dataConn = conn;
                 setupChatListeners();
-                logSystem("⚡ BLITZ-VERBINDUNG HERGESTELLT!");
+                logSystem("⚡ VERBINDUNG HERGESTELLT!");
             });
 
-            // EINGEHENDER ANRUF (WHATSAPP-STYLE VOLLBILD)
             peer.on('call', async (call) => {
                 const acceptCall = confirm("Eingehender Video-Anruf! Annehmen?");
                 if (acceptCall) {
@@ -582,29 +617,63 @@
 
                         mediaCall = call;
                         openCallOverlay();
-                        logSystem("Anruf gestartet.");
+                        logSystem("Anruf aktiv.");
                     } catch(err) {
-                        alert("Zugriff auf Kamera/Mikrofon verweigert.");
+                        alert("Kamera/Mikrofon Zugriff verweigert.");
                     }
                 }
             });
         }
 
-        // INSTANT CONNECT
-        function connectToPeer() {
+        // 5 SEKUNDEN LADEBALKEN & AUTO-CONNECT
+        function start5SecConnection() {
             const inputVal = document.getElementById('targetPeerId').value.trim();
-            if(!inputVal || inputVal.length < 6) return alert("Gib den 6-stelligen Code ein!");
+            if(!inputVal || inputVal.length < 6) return alert("Gib erst den 6-stelligen Code ein!");
 
             const fullTargetId = "nullsec-" + inputVal;
-            logSystem(`Verbinde blitzschnell zu ${inputVal}...`);
-            
+            const btn = document.getElementById('connectBtn');
+            const fill = document.getElementById('progressBarFill');
+            const percentText = document.getElementById('progressPercent');
+            const labelText = document.getElementById('progressLabel');
+            const badge = document.getElementById('statusBadge');
+
+            btn.disabled = true;
+            labelText.innerText = "STATUS: VERBINDUNG WIRD AUFGEBAUT...";
+            badge.innerHTML = `<div class="pulse-dot"></div> LÄDT...`;
+
+            // Signal abfeuern
             dataConn = peer.connect(fullTargetId, { reliable: true });
             setupChatListeners();
+
+            // 5-Sekunden-Timer
+            let progress = 0;
+            const duration = 5000; // 5000ms = 5 Sekunden
+            const intervalTime = 50; 
+            const step = (intervalTime / duration) * 100;
+
+            const progressInterval = setInterval(() => {
+                progress += step;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(progressInterval);
+                    
+                    fill.style.width = "100%";
+                    percentText.innerText = "100%";
+                    labelText.innerText = "STATUS: TUNNEL AKTIV";
+                    badge.innerHTML = `<div class="pulse-dot"></div> TUNNEL AKTIV`;
+                    btn.disabled = false;
+                    
+                    logSystem("✅ 5-Sekunden Handshake abgeschlossen. Chat bereit!");
+                } else {
+                    fill.style.width = progress + "%";
+                    percentText.innerText = Math.floor(progress) + "%";
+                }
+            }, intervalTime);
         }
 
         function setupChatListeners() {
             dataConn.on('open', () => {
-                logSystem("⚡ Tunnel aktiv! Nachrichten fliegen durch den RAM.");
+                logSystem("⚡ Live-Datenkanal steht.");
             });
 
             dataConn.on('data', (data) => {
@@ -613,6 +682,9 @@
 
             dataConn.on('close', () => {
                 logSystem("Verbindung getrennt.");
+                document.getElementById('progressLabel').innerText = "STATUS: BEREIT";
+                document.getElementById('progressBarFill').style.width = "0%";
+                document.getElementById('progressPercent').innerText = "0%";
             });
         }
 
@@ -626,7 +698,7 @@
                 addChatBubble(msg, 'me');
                 input.value = '';
             } else {
-                alert("Erst Code eingeben und 'Verbinden' drücken!");
+                alert("Warte kurz, bis der Ladebalken 100% erreicht hat!");
             }
         }
 
@@ -648,10 +720,9 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // ANRUF STARTEN & VOLLBILD ANZEIGEN
         async function startCall(withVideo) {
             const inputVal = document.getElementById('targetPeerId').value.trim();
-            if(!inputVal) return alert("Gib erst den Code deines Freundes ein!");
+            if(!inputVal) return alert("Gib erst den Code ein!");
 
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ 
@@ -668,13 +739,12 @@
                 });
 
                 openCallOverlay();
-                logSystem("Anruf aufgebaut...");
+                logSystem("Anruf wird gestartet...");
             } catch(err) {
                 alert("Kamera oder Mikrofon konnte nicht gestartet werden.");
             }
         }
 
-        // FULLSCREEN OVERLAY MANAGEMENT
         function openCallOverlay() {
             const targetId = document.getElementById('targetPeerId').value.trim() || "PARTNER";
             document.getElementById('callPartnerId').innerText = "#" + targetId;
@@ -718,7 +788,6 @@
             }
         }
 
-        // LINK & QR CODE
         function copyFastLink() {
             const currentCode = document.getElementById('myPeerId').innerText;
             if(currentCode === '------') return;
