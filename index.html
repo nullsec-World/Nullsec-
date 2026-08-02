@@ -3,269 +3,380 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Power BY #NULLSEC - Secure Ghost Comm</title>
+  <title>#NULLSEC // SECURE P2P</title>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
-    body { background-color: #020408; color: #00ff88; min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
-    #splash-screen {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background-color: #010204; display: flex; flex-direction: column;
-      justify-content: center; align-items: center; z-index: 9999;
-      transition: opacity 0.6s ease, visibility 0.6s ease;
+    :root {
+      --bg-base: #0b0f19;
+      --bg-panel: #111827;
+      --bg-hover: #1f2937;
+      --accent: #00ff88;
+      --accent-glow: rgba(0, 255, 136, 0.25);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: #1f2937;
     }
-    .brand-title { font-size: 2rem; font-weight: bold; color: #00ff88; text-shadow: 0 0 20px rgba(0, 255, 136, 0.9); text-align: center; }
-    .status-text { margin-top: 15px; font-size: 0.75rem; color: #00ff8866; letter-spacing: 2px; }
 
-    #app-container { display: flex; flex-direction: column; height: 100vh; max-width: 650px; margin: 0 auto; width: 100%; border-left: 1px solid #00ff8822; border-right: 1px solid #00ff8822; opacity: 0; transition: opacity 0.4s ease; background: #04060b; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: #030712; color: var(--text-main); height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+
+    /* Main Container im App-Look */
+    #app-container {
+      width: 100%; max-width: 480px; height: 100%; max-height: 900px;
+      background: var(--bg-base); display: flex; flex-direction: column;
+      border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      position: relative; overflow: hidden;
+    }
+    @media (min-width: 481px) {
+      #app-container { border-radius: 16px; height: 92vh; }
+    }
+
+    /* Top Header */
+    header {
+      background: var(--bg-panel); padding: 12px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand-area { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+    .my-avatar-preview { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); background: #000; }
+    .brand-info h1 { font-size: 0.95rem; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; }
+    .brand-info p { font-size: 0.7rem; color: var(--text-muted); }
+
+    .header-actions { display: flex; gap: 8px; }
+    .icon-btn {
+      background: var(--bg-hover); border: none; color: var(--text-main);
+      width: 34px; height: 34px; border-radius: 50%; display: flex;
+      align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem;
+      transition: 0.2s;
+    }
+    .icon-btn:hover { background: var(--accent); color: #000; }
+
+    /* Security Banner */
+    #security-banner {
+      background: rgba(0, 255, 136, 0.05); border-bottom: 1px solid rgba(0, 255, 136, 0.15);
+      padding: 6px; text-align: center; font-size: 0.65rem; color: var(--accent);
+      font-weight: 600; letter-spacing: 0.5px;
+    }
+
+    /* Layout Content */
+    .main-view { display: flex; flex: 1; overflow: hidden; position: relative; }
     
-    header { padding: 8px 12px; background-color: #070a12; border-bottom: 1px solid #00ff8844; display: flex; justify-content: space-between; align-items: center; }
-    .header-brand { font-weight: bold; font-size: 0.9rem; color: #00ff88; letter-spacing: 1px; }
-    .header-btns { display: flex; gap: 4px; align-items: center; }
-    .btn-cyber { font-size: 0.6rem; background: rgba(0, 255, 136, 0.08); border: 1px solid #00ff8866; padding: 4px 8px; border-radius: 4px; color: #00ff88; cursor: pointer; text-decoration: none; text-transform: uppercase; transition: all 0.2s; }
-    .btn-cyber:hover { background: #00ff88; color: #000; box-shadow: 0 0 10px #00ff88; }
-
-    #security-banner { background-color: #030a06; border-bottom: 1px dashed #00ff8844; padding: 4px; text-align: center; font-size: 0.55rem; color: #00ff88; letter-spacing: 1px; }
-
-    /* VPN-Rotator Banner */
-    #vpn-ticker { background: #050d08; border-bottom: 1px solid #00ff8822; padding: 5px 10px; font-size: 0.65rem; display: flex; justify-content: space-between; align-items: center; color: #00ff88cc; }
-    .pulsing-dot { width: 8px; height: 8px; background-color: #00ff88; border-radius: 50%; box-shadow: 0 0 8px #00ff88; animation: pulse 1.5s infinite; }
-    @keyframes pulse { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
-
-    #main-layout { display: flex; flex: 1; overflow: hidden; position: relative; }
+    /* Sidebar (Kontaktliste) */
+    #sidebar {
+      width: 100%; background: var(--bg-base); display: flex; flex-direction: column;
+      position: absolute; top: 0; left: 0; height: 100%; z-index: 2;
+      transition: transform 0.3s ease;
+    }
+    #sidebar.hidden { transform: translateX(-100%); }
     
-    #sidebar { width: 150px; background: #05080e; border-right: 1px solid #00ff8822; display: flex; flex-direction: column; padding: 8px; gap: 6px; overflow-y: auto; }
-    .sidebar-header { font-size: 0.65rem; color: #00ff8888; margin-bottom: 2px; display: flex; justify-content: space-between; align-items: center; }
-    .chat-contact-item { padding: 6px; background: #090e18; border: 1px solid #00ff8811; border-radius: 4px; font-size: 0.7rem; color: #aaa; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-    .chat-contact-item.active { border-color: #00ff88; color: #00ff88; background: #061710; }
-    .contact-avatar { width: 22px; height: 22px; border-radius: 50%; background: #112; border: 1px solid #00ff8844; object-fit: cover; flex-shrink: 0; }
+    .sidebar-search { padding: 10px; background: var(--bg-panel); border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
+    .sidebar-search input {
+      flex: 1; background: var(--bg-base); border: 1px solid var(--border);
+      padding: 8px 12px; border-radius: 20px; color: #fff; font-size: 0.85rem; outline: none;
+    }
+    .sidebar-search input:focus { border-color: var(--accent); }
 
-    #chat-pane { flex: 1; display: flex; flex-direction: column; background-color: #03050a; }
+    .contact-list { flex: 1; overflow-y: auto; }
+    .contact-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      cursor: pointer; border-bottom: 1px solid rgba(255,255,136,0.02);
+      transition: background 0.15s;
+    }
+    .contact-item:hover { background: var(--bg-panel); }
+    .contact-item.active { background: var(--bg-hover); }
+    .contact-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #222; flex-shrink: 0; }
+    .contact-details { flex: 1; overflow: hidden; }
+    .contact-name { font-weight: 600; font-size: 0.9rem; color: #fff; }
+    .contact-sub { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    #connect-bar { padding: 8px 10px; background: #060912; border-bottom: 1px solid #00ff8822; display: flex; flex-direction: column; gap: 4px; }
-    .my-info-row { font-size: 0.7rem; display: flex; justify-content: space-between; align-items: center; color: #888; }
+    /* Chat Bereich */
+    #chat-pane {
+      width: 100%; height: 100%; display: flex; flex-direction: column;
+      background: #070a14; position: absolute; top: 0; left: 0; z-index: 1;
+    }
     
-    input[type="text"] { width: 100%; padding: 7px 10px; background-color: #020306; border: 1px solid #00ff8844; border-radius: 4px; color: #fff; font-family: inherit; outline: none; font-size: 0.75rem; }
-    input[type="text"]:focus { border-color: #00ff88; box-shadow: 0 0 6px rgba(0, 255, 136, 0.4); }
+    .chat-header {
+      padding: 10px 16px; background: var(--bg-panel); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .chat-header-left { display: flex; align-items: center; gap: 10px; }
+    .back-btn { background: none; border: none; color: var(--accent); font-size: 1.2rem; cursor: pointer; display: none; }
     
-    .action-btn { padding: 7px 12px; background: #00ff88; color: #000; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.7rem; }
-
-    #active-chat-header { padding: 6px 10px; background: #070b14; border-bottom: 1px solid #00ff8822; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; }
-    .call-controls { display: flex; gap: 4px; }
-
-    #chat-box { flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
-    .message { max-width: 82%; padding: 7px 10px; border-radius: 6px; font-size: 0.75rem; line-height: 1.4; word-break: break-word; }
-    .message.sent { align-self: flex-end; background-color: #00381d; color: #d4ffd6; border: 1px solid #00ff8844; }
-    .message.received { align-self: flex-start; background-color: #0a101d; color: #ccc; border: 1px solid #1a2a40; }
-    .message.system { align-self: center; background-color: transparent; color: #00ff88aa; font-size: 0.6rem; border: none; text-align: center; }
-    .message .time { font-size: 0.5rem; opacity: 0.5; margin-top: 2px; text-align: right; }
-
-    #input-area { padding: 8px; background: #070a12; display: flex; gap: 6px; border-top: 1px solid #00ff8822; }
-
-    .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 999; }
-    .modal-content { background: #070a14; border: 1px solid #00ff88; padding: 20px; border-radius: 8px; width: 90%; max-width: 320px; display: flex; flex-direction: column; gap: 10px; }
-    .modal-title { font-size: 0.85rem; color: #00ff88; font-weight: bold; text-align: center; }
+    .chat-messages {
+      flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
+      background-image: radial-gradient(circle at center, #0b1329 0%, #030712 100%);
+    }
     
-    #video-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 8888; display: none; flex-direction: column; justify-content: space-between; padding: 20px; }
-    video { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; z-index:1; }
-    .video-ui { z-index: 2; display: flex; justify-content: space-between; width: 100%; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 6px; }
+    .message { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; line-height: 1.4; word-break: break-word; position: relative; }
+    .message.sent { align-self: flex-end; background: #064e3b; color: #ecfdf5; border-top-right-radius: 2px; }
+    .message.received { align-self: flex-start; background: #1f2937; color: #f3f4f6; border-top-left-radius: 2px; }
+    .message .time { font-size: 0.6rem; opacity: 0.6; margin-top: 4px; text-align: right; display: block; }
+    .message.system { align-self: center; background: rgba(0,0,0,0.4); color: var(--accent); font-size: 0.7rem; border-radius: 8px; border: 1px solid rgba(0,255,136,0.2); text-align: center; }
+
+    .chat-input-area {
+      padding: 12px 16px; background: var(--bg-panel); border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .chat-input-area input {
+      flex: 1; background: var(--bg-base); border: 1px solid var(--border);
+      padding: 10px 16px; border-radius: 24px; color: #fff; font-size: 0.9rem; outline: none;
+    }
+    .chat-input-area input:focus { border-color: var(--accent); }
+    .send-btn {
+      background: var(--accent); color: #000; border: none; width: 40px; height: 40px;
+      border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: 0.2s;
+    }
+    .send-btn:hover { transform: scale(1.05); box-shadow: 0 0 10px var(--accent-glow); }
+
+    /* Modals (Profil & Info) */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
+      display: none; justify-content: center; align-items: center; z-index: 9999;
+    }
+    .modal-box {
+      background: var(--bg-panel); border: 1px solid var(--border); width: 90%; max-width: 360px;
+      padding: 24px; border-radius: 16px; display: flex; flex-direction: column; gap: 16px;
+    }
+    .modal-title { font-size: 1.1rem; font-weight: bold; color: var(--accent); text-align: center; }
+    .modal-box input {
+      background: var(--bg-base); border: 1px solid var(--border); padding: 10px 14px;
+      border-radius: 8px; color: #fff; font-size: 0.9rem; outline: none; width: 100%;
+    }
+    .modal-box input:focus { border-color: var(--accent); }
+    .btn-primary {
+      background: var(--accent); color: #000; border: none; padding: 12px;
+      border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center;
+    }
+    .btn-secondary {
+      background: transparent; color: var(--text-muted); border: 1px solid var(--border);
+      padding: 10px; border-radius: 8px; cursor: pointer; text-align: center;
+    }
+
+    /* Video Call Overlay */
+    #call-screen {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #000; z-index: 99999; display: none; flex-direction: column; justify-content: space-between; padding: 20px;
+    }
+    #remote-video { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; z-index: 1; }
+    #local-video { width: 100px; height: 140px; border-radius: 12px; object-fit: cover; position: fixed; right: 20px; bottom: 90px; z-index: 2; border: 2px solid var(--accent); }
+    .call-ui-top { z-index: 3; background: rgba(0,0,0,0.6); padding: 10px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .call-ui-bottom { z-index: 3; display: flex; justify-content: center; gap: 20px; padding-bottom: 20px; }
+    .call-btn { width: 50px; height: 50px; border-radius: 50%; border: none; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+    @media(min-width: 481px) {
+      .back-btn { display: none !important; }
+      #sidebar { width: 320px; border-right: 1px solid var(--border); }
+      #chat-pane { left: 320px; width: calc(100% - 320px); position: absolute; }
+    }
+    @media(max-width: 480px) {
+      .back-btn { display: block; }
+      #sidebar.mobile-hidden { display: none; }
+    }
   </style>
 </head>
 <body>
 
-  <div id="splash-screen">
-    <div class="brand-title">#NULLSEC GHOST</div>
-    <div class="status-text">> STARTE MULTI-VPN ROTATOR...</div>
-  </div>
-
-  <div id="video-container">
-    <video id="remote-video" autoplay playsinline></video>
-    <video id="local-video" autoplay playsinline muted style="width: 90px; height: 130px; right: 20px; bottom: 80px; position: fixed; border: 1px solid #00ff88; border-radius: 6px; object-fit: cover; z-index: 3;"></video>
-    <div class="video-ui">
-      <span id="call-status-text" style="color:#00ff88; font-size:0.75rem;">Verbindung läuft...</span>
-      <button class="btn-cyber" style="background:#ff4444; border-color:#ff4444; color:#fff;" onclick="endCall()">Auflegen</button>
+  <!-- Info Modal (Was macht die Webseite?) -->
+  <div class="modal-overlay" id="info-modal">
+    <div class="modal-box">
+      <div class="modal-title">#NULLSEC SYSTEM INFO</div>
+      <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">
+        Diese Web-App ist ein rein dezentraler, verschlüsselter P2P-Messenger.
+        <br><br>
+        • <strong>Keine Server-Speicherung:</strong> Nachrichten fließen direkt Peer-to-Peer über WebRTC von Gerät zu Gerät.<br>
+        • <strong>Chatkontrolle Unmöglich:</strong> Es gibt keine zentrale Datenbank, die überwacht werden kann.<br>
+        • <strong>Eigene Daten:</strong> Profilbilder und Namen werden lokal auf deinem Gerät gespeichert.
+      </p>
+      <button class="btn-primary" onclick="toggleModal('info-modal', false)">Verstanden</button>
     </div>
   </div>
 
-  <div class="modal" id="profile-modal">
-    <div class="modal-content">
-      <div class="modal-title">DEIN PROFIL</div>
-      <input type="text" id="my-name-input" placeholder="Name..." />
-      <input type="text" id="my-avatar-input" placeholder="Avatar Bild-URL..." />
-      <button class="action-btn" onclick="saveProfile()">Speichern</button>
-      <button class="btn-cyber" onclick="toggleModal('profile-modal', false)">Schließen</button>
+  <!-- Profil Bearbeiten Modal -->
+  <div class="modal-overlay" id="profile-modal">
+    <div class="modal-box">
+      <div class="modal-title">DEIN PROFIL BEARBEITEN</div>
+      <div>
+        <label style="font-size: 0.75rem; color: var(--text-muted);">Dein Name:</label>
+        <input type="text" id="input-my-name" placeholder="Name eingeben..." />
+      </div>
+      <div>
+        <label style="font-size: 0.75rem; color: var(--text-muted);">Profilbild (Direkt-Link zu Bild):</label>
+        <input type="text" id="input-my-avatar" placeholder="https://..." />
+      </div>
+      <button class="btn-primary" onclick="saveMyProfile()">Speichern</button>
+      <button class="btn-secondary" onclick="toggleModal('profile-modal', false)">Abbrechen</button>
+    </div>
+  </div>
+
+  <!-- Call Screen -->
+  <div id="call-screen">
+    <video id="remote-video" autoplay playsinline></video>
+    <video id="local-video" autoplay playsinline muted></video>
+    <div class="call-ui-top">
+      <span id="call-status-label" style="color: var(--accent); font-size: 0.85rem; font-weight: bold;">Verbinde...</span>
+    </div>
+    <div class="call-ui-bottom">
+      <button class="call-btn" style="background: #ef4444; color: #fff;" onclick="endCall()">📞</button>
     </div>
   </div>
 
   <div id="app-container">
+    <!-- Header -->
     <header>
-      <div class="header-brand" id="header-my-name">#NULLSEC</div>
-      <div class="header-btns">
-        <button class="btn-cyber" onclick="toggleModal('profile-modal', true)">Profil</button>
-        <button class="btn-cyber" onclick="downloadApp()">APK</button>
-        <div class="btn-cyber" id="conn-status" style="border-color:#ff4444; color:#ff4444;">OFFLINE</div>
+      <div class="brand-area" onclick="toggleModal('profile-modal', true)">
+        <img id="header-avatar" class="my-avatar-preview" src="" alt="Avatar" />
+        <div class="brand-info">
+          <h1 id="header-name">Lade...</h1>
+          <p id="my-peer-id-display">ID: ...</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="toggleModal('info-modal', true)" title="Info">ℹ️</button>
+        <button class="icon-btn" onclick="addNewChatPrompt()" title="Neuer Chat">➕</button>
       </div>
     </header>
 
+    <!-- Security Banner -->
     <div id="security-banner">
-      [🔒 E2EE AKTIV | CHATKONTROLLE UNMÖGLICH]
+      🔒 END-TO-END VERSCHLÜSSELT | CHATKONTROLLE UNMÖGLICH
     </div>
 
-    <!-- Live Multi-VPN Ticker der alle 6 Sekunden rotiert -->
-    <div id="vpn-ticker">
-      <div style="display:flex; align-items:center; gap:6px;">
-        <div class="pulsing-dot"></div>
-        <span id="vpn-status-text">Multi-Node VPN: Initialisiere...</span>
-      </div>
-      <span id="vpn-ip-text" style="color:#00ff8888;">IP: 127.0.0.1</span>
-    </div>
-
-    <div id="main-layout">
+    <!-- Main View -->
+    <div class="main-view">
+      <!-- Sidebar (Kontaktliste) -->
       <div id="sidebar">
-        <div class="sidebar-header">
-          <span>CHATS</span>
-          <span style="cursor:pointer;" onclick="showAddPrompt()">+</span>
+        <div class="sidebar-search">
+          <input type="text" id="new-peer-input" placeholder="Friend-Code eingeben & Enter..." />
         </div>
-        <div id="contact-list"></div>
+        <div class="contact-list" id="contact-list-container">
+          <!-- Dynamische Kontakte -->
+        </div>
       </div>
 
+      <!-- Chat Pane -->
       <div id="chat-pane">
-        <div id="connect-bar">
-          <div class="my-info-row">
-            <span>Code: <strong id="my-code" style="color:#fff;">...</strong></span>
-            <span style="cursor:pointer; color:#00ff88;" onclick="navigator.clipboard.writeText(document.getElementById('my-code').textContent); alert('Code kopiert!');">Kopieren</span>
+        <div class="chat-header">
+          <div class="chat-header-left">
+            <button class="back-btn" onclick="closeChatMobile()">←</button>
+            <img id="active-chat-avatar" class="contact-avatar" style="width:36px;height:36px;" src="https://i.imgur.com/8Km9tLL.png" />
+            <div>
+              <div id="active-chat-name" style="font-weight: 600; font-size: 0.9rem;">Wähle einen Chat</div>
+              <div id="active-chat-status" style="font-size: 0.65rem; color: var(--text-muted);">Offline</div>
+            </div>
           </div>
-          <div style="display: flex; gap: 4px;">
-            <input type="text" id="target-code-input" placeholder="Friend-Code eingeben..." />
-            <button class="action-btn" id="btn-connect">Connect</button>
-          </div>
-        </div>
-
-        <div id="active-chat-header">
-          <span id="active-partner-name" style="color:#fff;">Kein Chat</span>
-          <div class="call-controls">
-            <button class="btn-cyber" onclick="startCall('audio')">📞 Audio</button>
-            <button class="btn-cyber" onclick="startCall('video')">📹 Video</button>
+          <div class="header-actions" id="call-buttons-group" style="display: none;">
+            <button class="icon-btn" onclick="startCall('audio')" title="Audioanruf">📞</button>
+            <button class="icon-btn" onclick="startCall('video')" title="Videoanruf">📹</button>
           </div>
         </div>
 
-        <div id="chat-box">
-          <div class="message system">Wähle einen Chat oder verbinde dich neu.</div>
+        <div class="chat-messages" id="chat-messages-box">
+          <div class="message system">Wähle links einen Kontakt oder füge einen Code hinzu.</div>
         </div>
 
-        <div id="input-area">
-          <input type="text" id="msg-input" placeholder="Nachricht..." disabled />
-          <button class="action-btn" id="btn-send" disabled>Senden</button>
+        <div class="chat-input-area">
+          <input type="text" id="msg-input" placeholder="Nachricht schreiben..." disabled />
+          <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>➤</button>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // Audio FX
+    // Audio Sound Effects
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playSound(freq, type, duration) {
+    function playBeep(freq, duration) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.type = type;
       osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + duration);
     }
 
-    setTimeout(() => {
-      document.getElementById('splash-screen').style.opacity = '0';
-      document.getElementById('splash-screen').style.visibility = 'hidden';
-      document.getElementById('app-container').style.opacity = '1';
-    }, 1000);
-
-    // Live VPN Node Rotator (Wechselt alle 6 Sekunden die VPN-Knoten und IP-Adressen)
-    const vpnLocations = [
-      { country: "Schweiz (Zürich)", ip: "185.220.101.5" },
-      { country: "Island (Reykjavik)", ip: "185.159.157.22" },
-      { country: "Panama City", ip: "190.171.24.12" },
-      { country: "Singapur", ip: "103.253.140.9" },
-      { country: "Tokio (Japan)", ip: "133.242.11.4" },
-      { country: "Schweden (Stockholm)", ip: "91.219.236.19" },
-      { country: "Cayman Islands", ip: "198.50.150.88" },
-      { country: "Luxemburg", ip: "158.255.2.14" }
-    ];
-
-    function rotateVpnNodes() {
-      const loc = vpnLocations[Math.floor(Math.random() * vpnLocations.length)];
-      const randomIpSub = Math.floor(10 + Math.random() * 240) + "." + Math.floor(10 + Math.random() * 240);
-      document.getElementById('vpn-status-text').textContent = `Multi-VPN Node: ${loc.country}`;
-      document.getElementById('vpn-ip-text').textContent = `IP: ${loc.ip.split('.')[0]}.${loc.ip.split('.')[1]}.${randomIpSub}`;
-    }
-    setInterval(rotateVpnNodes, 6000); // Rotiert alle 6 Sekunden
-    rotateVpnNodes();
-
-    let myProfile = JSON.parse(localStorage.getItem('nullsec_profile')) || { name: "Ghost_" + Math.floor(Math.random()*900+100), avatar: "https://i.imgur.com/8Km9tLL.png" };
+    // Lokaler Speicher für eigenes Profil & Kontakte
+    let myProfile = JSON.parse(localStorage.getItem('nullsec_profile')) || {
+      name: "User_" + Math.floor(Math.random() * 9000 + 1000),
+      avatar: "https://i.imgur.com/8Km9tLL.png"
+    };
     let chats = JSON.parse(localStorage.getItem('nullsec_chats')) || {};
     let contactsInfo = JSON.parse(localStorage.getItem('nullsec_contacts_info')) || {};
 
-    document.getElementById('header-my-name').textContent = myProfile.name;
-    document.getElementById('my-name-input').value = myProfile.name;
-    document.getElementById('my-avatar-input').value = myProfile.avatar;
+    updateMyProfileUI();
 
-    function saveProfile() {
-      myProfile.name = document.getElementById('my-name-input').value || "Ghost";
-      myProfile.avatar = document.getElementById('my-avatar-input').value || "https://i.imgur.com/8Km9tLL.png";
+    function updateMyProfileUI() {
+      document.getElementById('header-name').textContent = myProfile.name;
+      document.getElementById('header-avatar').src = myProfile.avatar;
+      document.getElementById('input-my-name').value = myProfile.name;
+      document.getElementById('input-my-avatar').value = myProfile.avatar;
+    }
+
+    function saveMyProfile() {
+      myProfile.name = document.getElementById('input-my-name').value.trim() || "Anonym";
+      myProfile.avatar = document.getElementById('input-my-avatar').value.trim() || "https://i.imgur.com/8Km9tLL.png";
       localStorage.setItem('nullsec_profile', JSON.stringify(myProfile));
-      document.getElementById('header-my-name').textContent = myProfile.name;
+      updateMyProfileUI();
       toggleModal('profile-modal', false);
-      if (activeConnection) activeConnection.send({ type: 'profile_update', profile: myProfile });
+      if (activeConnection && activeConnection.open) {
+        activeConnection.send({ type: 'profile_sync', profile: myProfile });
+      }
     }
 
     function toggleModal(id, show) {
       document.getElementById(id).style.display = show ? 'flex' : 'none';
     }
 
-    let peer = null;
+    // PeerJS Setup
+    const myId = "nullsec-" + Math.floor(Math.random() * 90000 + 10000);
+    const peer = new Peer(myId);
+
+    peer.on('open', (id) => {
+      document.getElementById('my-peer-id-display').textContent = "ID: " + id;
+      renderContactList();
+    });
+
     let activeConnection = null;
     let activePeerId = null;
     let localStream = null;
     let currentCall = null;
 
-    const randomId = "nullsec-" + Math.floor(1000 + Math.random() * 9000);
-    peer = new Peer(randomId);
-
-    peer.on('open', (id) => {
-      document.getElementById('my-code').textContent = id;
-      renderContactList();
-    });
-
-    peer.on('connection', (incomingConn) => {
-      setupConnection(incomingConn);
+    peer.on('connection', (conn) => {
+      setupConnection(conn);
     });
 
     peer.on('call', async (call) => {
       currentCall = call;
-      document.getElementById('video-container').style.display = 'flex';
+      document.getElementById('call-screen').style.display = 'flex';
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         document.getElementById('local-video').srcObject = localStream;
         call.answer(localStream);
         call.on('stream', (remoteStream) => {
           document.getElementById('remote-video').srcObject = remoteStream;
-          document.getElementById('call-status-text').textContent = "GESICHERTER ANRUF LÄUFT";
+          document.getElementById('call-status-label').textContent = "LIVE GESPRÄCH";
         });
-      } catch (err) {
-        alert("Mikrofon/Kamera blockiert.");
+      } catch(e) { alert("Medien-Fehler"); }
+    });
+
+    // Enter zum Hinzufügen von Peer
+    document.getElementById('new-peer-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const targetId = e.target.value.trim();
+        if (targetId && targetId !== myId) {
+          connectToPeer(targetId);
+          e.target.value = '';
+        }
       }
     });
 
-    document.getElementById('btn-connect').addEventListener('click', () => {
-      const targetId = document.getElementById('target-code-input').value.trim();
-      if (!targetId || targetId === peer.id) return;
-      connectToPeer(targetId);
-    });
+    function addNewChatPrompt() {
+      const code = prompt("Friend-Code eingeben:");
+      if (code) connectToPeer(code.trim());
+    }
 
     function connectToPeer(targetId) {
       if (activeConnection) activeConnection.close();
@@ -278,36 +389,34 @@
       activePeerId = conn.peer;
 
       if (!chats[activePeerId]) chats[activePeerId] = [];
-      saveData();
+      saveChats();
       renderContactList();
       switchToChat(activePeerId);
 
       conn.on('open', () => {
-        document.getElementById('conn-status').textContent = "ONLINE";
-        document.getElementById('conn-status').style.borderColor = "#00ff88";
-        document.getElementById('conn-status').style.color = "#00ff88";
+        document.getElementById('active-chat-status').textContent = "Online";
         document.getElementById('msg-input').disabled = false;
-        document.getElementById('btn-send').disabled = false;
-        conn.send({ type: 'profile_update', profile: myProfile });
-        playSound(800, 'sine', 0.15);
+        document.getElementById('send-btn').disabled = false;
+        document.getElementById('call-buttons-group').style.display = 'flex';
+        conn.send({ type: 'profile_sync', profile: myProfile });
+        playBeep(800, 0.1);
       });
 
       conn.on('data', (data) => {
-        if (data.type === 'profile_update') {
+        if (data.type === 'profile_sync') {
           contactsInfo[activePeerId] = data.profile;
           localStorage.setItem('nullsec_contacts_info', JSON.stringify(contactsInfo));
           renderContactList();
-          updateChatHeader();
-        } else if (data.type === 'chat_msg') {
-          playSound(500, 'triangle', 0.1);
-          appendMessageToChat(activePeerId, data.text, 'received');
+          updateChatHeaderInfo();
+        } else if (data.type === 'msg') {
+          playBeep(500, 0.08);
+          appendMessage(activePeerId, data.text, 'received');
         }
       });
 
       conn.on('close', () => {
-        document.getElementById('conn-status').textContent = "OFFLINE";
-        document.getElementById('conn-status').style.borderColor = "#ff4444";
-        document.getElementById('conn-status').style.color = "#ff4444";
+        document.getElementById('active-chat-status').textContent = "Offline";
+        document.getElementById('call-buttons-group').style.display = 'none';
       });
     }
 
@@ -316,84 +425,104 @@
       const text = input.value.trim();
       if (!text || !activeConnection || !activePeerId) return;
 
-      activeConnection.send({ type: 'chat_msg', text: text });
-      appendMessageToChat(activePeerId, text, 'sent');
-      playSound(600, 'square', 0.08);
+      activeConnection.send({ type: 'msg', text: text });
+      appendMessage(activePeerId, text, 'sent');
+      playBeep(650, 0.06);
       input.value = '';
     }
 
-    document.getElementById('btn-send').addEventListener('click', sendMessage);
     document.getElementById('msg-input').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') sendMessage();
     });
 
-    function appendMessageToChat(peerId, text, type) {
+    function appendMessage(peerId, text, type) {
       if (!chats[peerId]) chats[peerId] = [];
-      chats[peerId].push({ text, type, time: new Date().toLocaleTimeString([], { hour: '2-2-digit', minute: '2-2-digit' }) });
-      saveData();
-      if (activePeerId === peerId) renderActiveChat();
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      chats[peerId].push({ text, type, time });
+      saveChats();
+      if (activePeerId === peerId) renderActiveChatMessages();
       renderContactList();
     }
 
-    function saveData() {
+    function saveChats() {
       localStorage.setItem('nullsec_chats', JSON.stringify(chats));
     }
 
     function renderContactList() {
-      const list = document.getElementById('contact-list');
-      list.innerHTML = '';
+      const container = document.getElementById('contact-list-container');
+      container.innerHTML = '';
       const keys = Object.keys(chats);
-      
+
+      if (keys.length === 0) {
+        container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Keine Chats vorhanden. Klicke oben auf ➕ um jemanden hinzuzufügen.</div>';
+        return;
+      }
+
       keys.forEach(id => {
         const info = contactsInfo[id] || { name: id, avatar: "https://i.imgur.com/8Km9tLL.png" };
+        const lastMsg = chats[id].length > 0 ? chats[id][chats[id].length - 1].text : "Keine Nachrichten";
+        
         const div = document.createElement('div');
-        div.className = `chat-contact-item ${activePeerId === id ? 'active' : ''}`;
+        div.className = `contact-item ${activePeerId === id ? 'active' : ''}`;
         div.innerHTML = `
-          <img src="${info.avatar}" class="contact-avatar" />
-          <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-            <div style="font-weight:bold;">${info.name}</div>
-            <div style="font-size:0.55rem; opacity:0.5;">${id}</div>
+          <img class="contact-avatar" src="${info.avatar}" alt="Avatar" />
+          <div class="contact-details">
+            <div class="contact-name">${info.name}</div>
+            <div class="contact-sub">${escapeHtml(lastMsg)}</div>
           </div>
         `;
         div.onclick = () => {
           switchToChat(id);
           if (!peer.connections[id]) connectToPeer(id);
         };
-        list.appendChild(div);
+        container.appendChild(div);
       });
     }
 
     function switchToChat(peerId) {
       activePeerId = peerId;
       renderContactList();
-      renderActiveChat();
-      updateChatHeader();
+      renderActiveChatMessages();
+      updateChatHeaderInfo();
+
       document.getElementById('msg-input').disabled = false;
-      document.getElementById('btn-send').disabled = false;
+      document.getElementById('send-btn').disabled = false;
+      document.getElementById('call-buttons-group').style.display = 'flex';
+
+      // Mobile Ansicht umschalten
+      if (window.innerWidth <= 480) {
+        document.getElementById('sidebar').classList.add('mobile-hidden');
+      }
     }
 
-    function updateChatHeader() {
-      const info = contactsInfo[activePeerId] || { name: activePeerId };
-      document.getElementById('active-partner-name').textContent = info.name + " (" + activePeerId + ")";
+    function closeChatMobile() {
+      document.getElementById('sidebar').classList.remove('mobile-hidden');
+      activePeerId = null;
     }
 
-    function renderActiveChat() {
-      const box = document.getElementById('chat-box');
+    function updateChatHeaderInfo() {
+      const info = contactsInfo[activePeerId] || { name: activePeerId, avatar: "https://i.imgur.com/8Km9tLL.png" };
+      document.getElementById('active-chat-name').textContent = info.name;
+      document.getElementById('active-chat-avatar').src = info.avatar;
+    }
+
+    function renderActiveChatMessages() {
+      const box = document.getElementById('chat-messages-box');
       box.innerHTML = '';
       if (!activePeerId || !chats[activePeerId]) return;
 
       chats[activePeerId].forEach(msg => {
         const div = document.createElement('div');
         div.className = `message ${msg.type}`;
-        div.innerHTML = `${escapeHtml(msg.text)} <div class="time">${msg.time}</div>`;
+        div.innerHTML = `${escapeHtml(msg.text)} <span class="time">${msg.time}</span>`;
         box.appendChild(div);
       });
       box.scrollTop = box.scrollHeight;
     }
 
     async function startCall(type) {
-      if (!activePeerId) return alert("Wähle erst einen Chat aus!");
-      document.getElementById('video-container').style.display = 'flex';
+      if (!activePeerId) return;
+      document.getElementById('call-screen').style.display = 'flex';
       try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: (type === 'video'), audio: true });
         document.getElementById('local-video').srcObject = localStream;
@@ -401,10 +530,10 @@
         currentCall = call;
         call.on('stream', (remoteStream) => {
           document.getElementById('remote-video').srcObject = remoteStream;
-          document.getElementById('call-status-text').textContent = "ANRUF AKTIV";
+          document.getElementById('call-status-label').textContent = "GESPRÄCH AKTIV";
         });
-      } catch (err) {
-        alert("Medien-Fehler.");
+      } catch(e) {
+        alert("Mikrofon/Kamera Zugriff verweigert.");
         endCall();
       }
     }
@@ -412,16 +541,7 @@
     function endCall() {
       if (localStream) localStream.getTracks().forEach(t => t.stop());
       if (currentCall) currentCall.close();
-      document.getElementById('video-container').style.display = 'none';
-    }
-
-    function showAddPrompt() {
-      const code = prompt("Friend-Code eingeben:");
-      if (code) connectToPeer(code.trim());
-    }
-
-    function downloadApp() {
-      alert("App als PWA installieren:\nTippe im Browser-Menü (oben rechts) auf 'Zum Startbildschirm hinzufügen'.");
+      document.getElementById('call-screen').style.display = 'none';
     }
 
     function escapeHtml(str) {
