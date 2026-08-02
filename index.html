@@ -3,25 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- RAM-ONLY SECURITY: Keinerlei Caching erlaubt -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>#NULLSEC • Ultra Fast P2P</title>
+    <title>#NULLSEC • Hyper-Fast P2P Encrypted Terminal</title>
     
-    <!-- PeerJS Framework -->
+    <!-- PeerJS Framework & QR Code Generator -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
+        /* ==========================================================================
+           CYBERPUNK NEON ULTRA STYLING (DESIGN SYSTEM)
+           ========================================================================== */
         :root {
-            --bg: #030712;
-            --card-bg: rgba(15, 23, 42, 0.75);
-            --accent: #00ffcc;
-            --accent-glow: rgba(0, 255, 204, 0.25);
-            --accent-dim: rgba(0, 255, 204, 0.08);
-            --danger: #ff3366;
+            --bg-dark: #020617;
+            --panel-bg: rgba(15, 23, 42, 0.85);
+            --panel-border: rgba(0, 255, 204, 0.2);
+            --neon-green: #00ffcc;
+            --neon-glow: rgba(0, 255, 204, 0.35);
+            --neon-dim: rgba(0, 255, 204, 0.08);
+            --neon-red: #ff0055;
+            --neon-blue: #00bfff;
             --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: rgba(255, 255, 255, 0.08);
+            --text-muted: #64748b;
             --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
         }
 
@@ -33,73 +39,93 @@
         }
 
         body {
-            background-color: var(--bg);
+            background-color: var(--bg-dark);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 16px;
+            padding: 20px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-image: 
-                radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 60%),
-                radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+                linear-gradient(rgba(0, 255, 204, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 204, 0.03) 1px, transparent 1px),
+                radial-gradient(circle at 50% 0%, var(--neon-glow) 0%, transparent 75%);
+            background-size: 30px 30px, 30px 30px, 100% 100%;
             background-attachment: fixed;
+            overflow-x: hidden;
         }
 
         .app-container {
             width: 100%;
-            max-width: 440px;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px var(--accent-glow);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            max-width: 480px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 28px;
+            box-shadow: 0 0 50px rgba(0, 255, 204, 0.15), inset 0 0 20px rgba(0, 255, 204, 0.05);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             gap: 16px;
-            padding: 20px;
+            padding: 24px;
+            position: relative;
+        }
+
+        .app-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
+            animation: scanline 4s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .brand-title {
             font-family: var(--font-mono);
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--accent);
-            letter-spacing: 2px;
-            text-shadow: 0 0 12px var(--accent-glow);
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px var(--neon-glow);
         }
 
         .status-badge {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             font-size: 0.65rem;
-            color: var(--accent);
-            background: var(--accent-dim);
-            padding: 5px 12px;
+            color: var(--neon-green);
+            background: var(--neon-dim);
+            padding: 6px 14px;
             border-radius: 20px;
             border: 1px solid rgba(0, 255, 204, 0.3);
             font-family: var(--font-mono);
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .pulse-dot {
-            width: 7px;
-            height: 7px;
-            background: var(--accent);
+            width: 8px;
+            height: 8px;
+            background: var(--neon-green);
             border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent);
+            box-shadow: 0 0 10px var(--neon-green);
             animation: pulse 1.2s infinite;
         }
 
@@ -110,83 +136,104 @@
         }
 
         .card {
-            background: rgba(2, 6, 23, 0.6);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 16px;
+            background: rgba(2, 6, 23, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
+            transition: border-color 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 255, 204, 0.3);
         }
 
         .card-title {
-            font-size: 0.65rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
             color: var(--text-muted);
             font-family: var(--font-mono);
             font-weight: 700;
         }
 
+        .code-display-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
         .code-display {
             font-family: var(--font-mono);
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: var(--accent);
-            letter-spacing: 6px;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: var(--neon-green);
+            letter-spacing: 8px;
             text-align: center;
-            text-shadow: 0 0 15px var(--accent-glow);
-            padding: 8px 0;
+            text-shadow: 0 0 20px var(--neon-glow);
+            padding: 10px;
+            width: 100%;
             background: rgba(0, 255, 204, 0.03);
+            border-radius: 14px;
+            border: 1px dashed rgba(0, 255, 204, 0.25);
+        }
+
+        #qrcode {
+            background: #fff;
+            padding: 10px;
             border-radius: 12px;
-            border: 1px dashed rgba(0, 255, 204, 0.2);
+            display: none;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
 
         .input-group {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
 
         input[type="text"] {
             flex: 1;
             background: rgba(2, 6, 23, 0.9);
-            border: 1px solid var(--border);
-            padding: 12px 16px;
-            border-radius: 12px;
-            color: var(--accent);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 18px;
+            border-radius: 14px;
+            color: var(--neon-green);
             font-family: var(--font-mono);
-            font-size: 0.95rem;
+            font-size: 1rem;
             outline: none;
             transition: all 0.2s ease;
         }
 
         input[type="text"]:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
+            border-color: var(--neon-green);
+            box-shadow: 0 0 15px var(--neon-glow);
         }
 
         .btn {
-            background: var(--accent);
-            color: #030712;
+            background: var(--neon-green);
+            color: #020617;
             border: none;
-            padding: 12px 18px;
-            border-radius: 12px;
-            font-weight: 800;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-weight: 900;
             font-family: var(--font-mono);
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.15s ease-in-out;
+            letter-spacing: 1px;
+            transition: all 0.2s ease;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .btn:hover {
-            box-shadow: 0 0 20px var(--accent-glow);
-            transform: translateY(-1px);
+            box-shadow: 0 0 25px var(--neon-glow);
+            transform: translateY(-2px);
         }
 
         .btn:active {
@@ -196,21 +243,22 @@
         .btn-secondary {
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-main);
-            border: 1px solid var(--border);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
             box-shadow: none;
         }
 
         .btn-danger {
-            background: var(--danger);
+            background: var(--neon-red);
             color: #fff;
         }
 
         .btn-danger:hover {
-            box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
         }
 
         .btn-full {
@@ -220,15 +268,15 @@
         .media-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 10px;
         }
 
         .video-wrapper {
             position: relative;
             aspect-ratio: 4/3;
             background: #000;
-            border-radius: 12px;
-            border: 1px solid var(--border);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
         }
 
@@ -240,72 +288,75 @@
 
         .video-tag {
             position: absolute;
-            bottom: 6px;
-            left: 6px;
-            font-size: 0.6rem;
+            bottom: 8px;
+            left: 8px;
+            font-size: 0.65rem;
             font-family: var(--font-mono);
-            background: rgba(0, 0, 0, 0.7);
-            padding: 2px 8px;
-            border-radius: 6px;
-            color: var(--accent);
-            backdrop-filter: blur(4px);
-        }
-
-        .chat-box {
-            height: 140px;
-            background: rgba(2, 6, 23, 0.8);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-        }
-
-        .chat-msg {
-            padding: 6px 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 3px 10px;
             border-radius: 8px;
-            word-break: break-word;
-            line-height: 1.3;
-        }
-
-        .chat-msg.me {
-            background: var(--accent-dim);
-            color: var(--accent);
-            align-self: flex-end;
+            color: var(--neon-green);
+            backdrop-filter: blur(5px);
             border: 1px solid rgba(0, 255, 204, 0.2);
         }
 
+        .chat-box {
+            height: 160px;
+            background: rgba(2, 6, 23, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 12px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        .chat-msg {
+            padding: 8px 12px;
+            border-radius: 10px;
+            word-break: break-word;
+            line-height: 1.4;
+        }
+
+        .chat-msg.me {
+            background: var(--neon-dim);
+            color: var(--neon-green);
+            align-self: flex-end;
+            border: 1px solid rgba(0, 255, 204, 0.25);
+        }
+
         .chat-msg.peer {
-            background: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
+            background: rgba(0, 191, 255, 0.12);
+            color: var(--neon-blue);
             align-self: flex-start;
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(0, 191, 255, 0.25);
         }
 
         .chat-msg.system {
             color: var(--text-muted);
             font-style: italic;
-            font-size: 0.7rem;
+            font-size: 0.72rem;
             text-align: center;
             background: transparent;
         }
 
         .app-footer {
             text-align: center;
-            font-size: 0.6rem;
+            font-size: 0.65rem;
             font-family: var(--font-mono);
             color: var(--text-muted);
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            padding-top: 8px;
         }
     </style>
 </head>
 <body>
 
     <div class="app-container">
+        <!-- HEADER -->
         <header class="app-header">
             <div class="brand-title">#NULLSEC</div>
             <div class="status-badge">
@@ -314,14 +365,20 @@
             </div>
         </header>
 
-        <!-- CODE GENERATOR -->
+        <!-- CODE GENERATOR & QR -->
         <div class="card">
             <div class="card-title">DEINE ANONYME VERBINDUNGS-ID</div>
-            <div class="code-display" id="myPeerId">------</div>
-            <button class="btn btn-secondary btn-full" onclick="initPeer()">ID NEU GENERIEREN 🔄</button>
+            <div class="code-display-box">
+                <div class="code-display" id="myPeerId">------</div>
+                <div id="qrcode"></div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+                <button class="btn btn-secondary btn-full" onclick="copyFastLink()">⚡ LINK KOPIEREN</button>
+                <button class="btn btn-secondary" onclick="toggleQR()">📱 QR</button>
+            </div>
         </div>
 
-        <!-- CONNECT BOX -->
+        <!-- FAST CONNECT -->
         <div class="card">
             <div class="card-title">BLITZ-VERBINDUNG</div>
             <div class="input-group">
@@ -330,9 +387,9 @@
             </div>
         </div>
 
-        <!-- MEDIA / CALLS -->
+        <!-- MEDIA CALLS -->
         <div class="card">
-            <div class="card-title">PEER-TO-PEER MEDIA</div>
+            <div class="card-title">REALTIME MEDIA STREAM</div>
             <div class="media-grid">
                 <div class="video-wrapper">
                     <video id="localVideo" autoplay muted playsinline></video>
@@ -343,18 +400,18 @@
                     <div class="video-tag">PARTNER</div>
                 </div>
             </div>
-            <div class="input-group" style="margin-top: 6px;">
+            <div class="input-group" style="margin-top: 8px;">
                 <button class="btn btn-full" onclick="startCall(true)">📹 VIDEO</button>
                 <button class="btn btn-full" onclick="startCall(false)">📞 AUDIO</button>
                 <button class="btn btn-danger" onclick="hangUp()">❌</button>
             </div>
         </div>
 
-        <!-- CHAT -->
+        <!-- RAM CHAT -->
         <div class="card">
             <div class="card-title">FLÜCHTIGER RAM-CHAT</div>
             <div class="chat-box" id="chatBox">
-                <div class="chat-msg system">System: Ultra-Fast High Priority Tunnel bereit.</div>
+                <div class="chat-msg system">System: High-Speed Direct Tunnel initialisiert.</div>
             </div>
             <div class="input-group">
                 <input type="text" id="chatInput" placeholder="Nachricht eingeben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
@@ -362,17 +419,22 @@
             </div>
         </div>
 
+        <!-- FOOTER -->
         <footer class="app-footer">
             E2E ENCRYPTED • ZERO LOGS • DIRECT P2P TUNNEL
         </footer>
     </div>
 
+    <!-- ==========================================================================
+       JAVASCRIPT LOGIC & HIGH-SPEED NETWORKING
+       ========================================================================== -->
     <script>
-        // ZERO-STORAGE GUARANTEE: Blockiert dauerhaftes Speichern auf dem Gerät
+        // STRICT ZERO-STORAGE GUARANTEE (Blockiert Speicherzugriffe im Browser)
         try {
             window.localStorage.clear();
             window.sessionStorage.clear();
             Storage.prototype.setItem = function() {};
+            Storage.prototype.getItem = function() { return null; };
         } catch(e) {}
 
         let peer = null;
@@ -380,11 +442,16 @@
         let mediaCall = null;
         let localStream = null;
 
-        // Blitz-Verbindung über Google & Cloudflare STUN Server
+        // Auto-Initialization mit High-Speed ICE Candidate Tuning
         function initPeer() {
             if(peer) peer.destroy();
             
-            const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
+            // Hash aus der URL auslesen (#nullsec-XXXXXX)
+            const urlHash = window.location.hash.replace('#', '');
+            const randomCode = (urlHash && urlHash.includes('nullsec-')) 
+                ? urlHash.replace('nullsec-', '') 
+                : Math.floor(100000 + Math.random() * 900000).toString();
+                
             const fullId = "nullsec-" + randomCode;
             
             peer = new Peer(fullId, {
@@ -396,19 +463,28 @@
                         { urls: 'stun:stun2.l.google.com:19302' },
                         { urls: 'stun:stun.cloudflare.com:3478' }
                     ],
-                    iceCandidatePoolSize: 10 // Vorab-Verbindungs-Pool für Highspeed
+                    iceCandidatePoolSize: 10
                 }
             });
 
             peer.on('open', (id) => {
                 document.getElementById('myPeerId').innerText = randomCode;
-                logSystem(`Sicherer Tunnel bereit. Code: ${randomCode}`);
+                generateQRCode(randomCode);
+                logSystem(`Sicherer RAM-Tunnel aktiv. Code: ${randomCode}`);
+
+                // Auto-Connect Trigger bei Direkt-Link
+                if (urlHash && urlHash !== fullId && urlHash.startsWith('nullsec-')) {
+                    const targetCode = urlHash.replace('nullsec-', '');
+                    document.getElementById('targetPeerId').value = targetCode;
+                    logSystem(`Blitz-Link erkannt! Verbinde zu ${targetCode}...`);
+                    setTimeout(() => connectToPeer(), 300);
+                }
             });
 
             peer.on('connection', (conn) => {
                 dataConn = conn;
                 setupChatListeners();
-                logSystem("BLITZ-VERBINDUNG HERGESTELLT!");
+                logSystem("⚡ BLITZ-VERBINDUNG HERGESTELLT!");
             });
 
             peer.on('call', async (call) => {
@@ -425,23 +501,23 @@
                         mediaCall = call;
                         logSystem("Anruf aktiv!");
                     } catch(err) {
-                        alert("Kamera/Mikrofon Zugriff verweigert.");
+                        alert("Zugriff auf Kamera/Mikrofon verweigert.");
                     }
                 }
             });
 
             peer.on('error', (err) => {
-                logSystem(`Status: Verbindungs-Update...`);
+                logSystem(`Verbindungs-Status: Suche Partner...`);
             });
         }
 
-        // Direktes Verbinden (Unter 1 Sekunde)
+        // Blitz-Verbindung aufbauen
         function connectToPeer() {
             const inputVal = document.getElementById('targetPeerId').value.trim();
             if(!inputVal || inputVal.length < 6) return alert("Gib den 6-stelligen Code ein!");
 
             const fullTargetId = "nullsec-" + inputVal;
-            logSystem(`Verbinde blitzschnell zu ${inputVal}...`);
+            logSystem(`Verbinde zu ${inputVal}...`);
             
             dataConn = peer.connect(fullTargetId, { reliable: true });
             setupChatListeners();
@@ -449,7 +525,7 @@
 
         function setupChatListeners() {
             dataConn.on('open', () => {
-                logSystem("Tunnel aktiv! Kommunikation verschlüsselt.");
+                logSystem("⚡ Tunnel aktiv! Kommunikation läuft live über RAM.");
             });
 
             dataConn.on('data', (data) => {
@@ -457,7 +533,7 @@
             });
 
             dataConn.on('close', () => {
-                logSystem("Verbindung getrennt. Speicher gesäubert.");
+                logSystem("Verbindung getrennt.");
             });
         }
 
@@ -493,6 +569,34 @@
             box.scrollTop = box.scrollHeight;
         }
 
+        // Link mit Auto-Connect kopieren
+        function copyFastLink() {
+            const currentCode = document.getElementById('myPeerId').innerText;
+            if(currentCode === '------') return;
+            
+            const fastUrl = window.location.origin + window.location.pathname + '#nullsec-' + currentCode;
+            navigator.clipboard.writeText(fastUrl);
+            alert("⚡ Blitz-Link kopiert! Sobald dein Kumpel den Link öffnet, verbindet ihr euch sofort.");
+        }
+
+        // QR Code Generator & Toggle
+        function generateQRCode(code) {
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            const fastUrl = window.location.origin + window.location.pathname + '#nullsec-' + code;
+            new QRCode(qrContainer, {
+                text: fastUrl,
+                width: 128,
+                height: 128
+            });
+        }
+
+        function toggleQR() {
+            const qr = document.getElementById('qrcode');
+            qr.style.display = (qr.style.display === 'block') ? 'none' : 'block';
+        }
+
+        // Realtime Video / Audio Calls
         async function startCall(withVideo) {
             const inputVal = document.getElementById('targetPeerId').value.trim();
             if(!inputVal) return alert("Gib erst den Code deines Freundes ein!");
@@ -527,6 +631,7 @@
             logSystem("Anruf beendet.");
         }
 
+        // App Start
         window.addEventListener('DOMContentLoaded', () => {
             initPeer();
         });
