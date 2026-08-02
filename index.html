@@ -6,13 +6,18 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>#NULLSEC SECURE P2P</title>
+    <title>#NULLSEC - Anonymous P2P Terminal</title>
+    
+    <!-- PeerJS CDN für echte P2P-Verbindungen -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
     <style>
         :root {
             --bg-color: #030712;
-            --card-bg: #0b1120;
-            --accent-color: #00ffcc;
-            --accent-dim: rgba(0, 255, 204, 0.15);
+            --panel-bg: rgba(11, 17, 32, 0.85);
+            --accent-green: #00ffcc;
+            --accent-dim: rgba(0, 255, 204, 0.12);
+            --accent-red: #ff3366;
             --text-main: #f3f4f6;
             --text-muted: #6b7280;
             --border-color: #1f2937;
@@ -31,45 +36,52 @@
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             padding: 15px;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 255, 204, 0.05) 0%, transparent 80%),
+                linear-gradient(rgba(3, 7, 18, 0.9), rgba(3, 7, 18, 0.9));
         }
 
-        .app-wrapper {
+        .app-container {
             width: 100%;
-            max-width: 500px;
-            background-color: var(--card-bg);
+            max-width: 480px;
+            background: var(--panel-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.15);
+            backdrop-filter: blur(12px);
             overflow: hidden;
-        }
-
-        .app-header {
-            background-color: rgba(15, 23, 42, 0.8);
-            border-bottom: 1px solid var(--border-color);
-            padding: 16px;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
         }
 
-        .brand-title {
+        /* HEADER */
+        .app-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        .brand-logo {
             font-family: var(--font-mono);
             font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--accent-color);
+            font-weight: 800;
+            color: var(--accent-green);
             letter-spacing: 2px;
+            text-shadow: 0 0 8px rgba(0, 255, 204, 0.4);
         }
 
-        .status-badge {
+        .status-pill {
             display: flex;
             align-items: center;
             gap: 6px;
             font-size: 0.7rem;
-            color: var(--accent-color);
+            color: var(--accent-green);
             background: var(--accent-dim);
             padding: 4px 10px;
             border-radius: 20px;
@@ -77,30 +89,59 @@
             font-family: var(--font-mono);
         }
 
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 6px var(--accent-green);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* BODY CONTENT */
         .app-body {
-            padding: 16px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 16px;
         }
 
-        .code-section {
-            background-color: #020617;
+        .card {
+            background: rgba(2, 6, 23, 0.7);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
+            border-radius: 12px;
+            padding: 16px;
         }
 
+        .card-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-family: var(--font-mono);
+        }
+
+        /* CODE GENERATOR DISPLAY */
         .code-display {
             font-family: var(--font-mono);
             font-size: 2.2rem;
             font-weight: 800;
-            color: var(--accent-color);
+            color: var(--accent-green);
             letter-spacing: 4px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+            margin: 4px 0;
         }
 
-        .connect-box {
+        /* INPUTS & BUTTONS */
+        .input-group {
             display: flex;
             gap: 8px;
         }
@@ -109,16 +150,21 @@
             flex: 1;
             background: #020617;
             border: 1px solid var(--border-color);
-            padding: 12px;
+            padding: 12px 14px;
             border-radius: 8px;
-            color: var(--accent-color);
+            color: var(--accent-green);
             font-family: var(--font-mono);
-            font-size: 1rem;
+            font-size: 0.9rem;
             outline: none;
+            transition: border 0.2s;
         }
 
-        button {
-            background-color: var(--accent-color);
+        input[type="text"]:focus {
+            border-color: var(--accent-green);
+        }
+
+        .btn {
+            background: var(--accent-green);
             color: #000;
             border: none;
             padding: 12px 16px;
@@ -127,154 +173,370 @@
             font-family: var(--font-mono);
             cursor: pointer;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
         }
 
-        .call-controls {
-            display: flex;
+        .btn:hover {
+            box-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
+            opacity: 0.9;
+        }
+
+        .btn-danger {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* MEDIA / VIDEO CONTAINER */
+        .media-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
+            margin-top: 5px;
         }
 
-        .btn-call {
-            flex: 1;
-            background: #10b981;
-            color: #fff;
+        .video-wrapper {
+            position: relative;
+            aspect-ratio: 4/3;
+            background: #000;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
         }
 
-        .btn-hangup {
-            flex: 1;
-            background: #ef4444;
-            color: #fff;
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
+        .video-label {
+            position: absolute;
+            bottom: 6px;
+            left: 6px;
+            font-size: 0.6rem;
+            font-family: var(--font-mono);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--accent-green);
+        }
+
+        /* CHAT SYSTEM */
         .chat-box {
-            background-color: #020617;
+            height: 160px;
+            background: #020617;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            height: 150px;
             padding: 10px;
             overflow-y: auto;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
         }
 
         .chat-msg {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 2px solid var(--border-color);
             padding: 6px 10px;
-            border-radius: 6px;
+            border-radius: 0 6px 6px 0;
+            word-break: break-word;
         }
 
-        .app-footer {
-            border-top: 1px solid var(--border-color);
-            padding: 12px;
-            text-align: center;
-            font-size: 0.7rem;
+        .chat-msg.me {
+            border-left-color: var(--accent-green);
+            background: var(--accent-dim);
+        }
+
+        .chat-msg.peer {
+            border-left-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .chat-msg.system {
+            border-left-color: var(--text-muted);
             color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* VPN BAR */
+        .vpn-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
             font-family: var(--font-mono);
+            color: var(--text-muted);
+        }
+
+        .vpn-bar span {
+            color: var(--accent-green);
+        }
+
+        /* FOOTER */
+        .app-footer {
+            padding: 12px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 0.65rem;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            background: rgba(15, 23, 42, 0.4);
         }
     </style>
 </head>
 <body>
 
-    <div class="app-wrapper">
+    <div class="app-container">
+        <!-- HEADER -->
         <header class="app-header">
-            <div class="brand-title">NULLSEC</div>
-            <div class="status-badge">IN-MEMORY ONLY</div>
+            <div class="brand-logo">#NULLSEC</div>
+            <div class="status-pill">
+                <div class="pulse-dot"></div>
+                P2P RAM-ONLY
+            </div>
         </header>
 
+        <!-- MAIN BODY -->
         <main class="app-body">
-            <!-- EIGENER CODE -->
-            <div class="code-section">
-                <div style="font-size: 0.7rem; color: var(--text-muted);">DEIN CODE (ZUM TEILEN)</div>
-                <div class="code-display" id="myCode">-----</div>
-                <button style="width: 100%; margin-top: 8px;" onclick="generateCode()">Neuen Code Erzeugen</button>
+            
+            <!-- VPN SIMULATION BAR -->
+            <div class="vpn-bar">
+                <div>ROUTE: <span id="vpnRoute">ROTATING...</span></div>
+                <div>IP: <span id="vpnIp">0.0.0.0</span></div>
             </div>
 
-            <!-- CODE VOM FREUND EINGEBEN -->
-            <div class="connect-box">
-                <input type="text" id="friendCode" placeholder="Code vom Freund eingeben..." maxlength="5">
-                <button onclick="connectToFriend()">Verbinden</button>
+            <!-- YOUR ACCESS CODE -->
+            <div class="card">
+                <div class="card-label">DEINE ANONYME P2P-ID</div>
+                <div class="code-display" id="myPeerId">--- ---</div>
+                <button class="btn btn-full" style="margin-top: 8px;" onclick="initPeer()">ID Neu Generieren</button>
             </div>
 
-            <!-- ANRUF KNÖPFE -->
-            <div class="call-controls">
-                <button class="btn-call" onclick="startCall()">Anrufen 📞</button>
-                <button class="btn-hangup" onclick="endCall()">Auflegen ❌</button>
+            <!-- CONNECT TO FRIEND -->
+            <div class="card">
+                <div class="card-label">VERBINDUNG AUFBAUEN</div>
+                <div class="input-group">
+                    <input type="text" id="targetPeerId" placeholder="ID vom Freund eingeben...">
+                    <button class="btn" onclick="connectToPeer()">Verbinden</button>
+                </div>
             </div>
 
-            <!-- CHAT FENSTER -->
-            <div class="chat-box" id="chatBox">
-                <div class="chat-msg" style="color: var(--text-muted);">System: Bereit für Anruf & Chat. Keine Speicherung.</div>
+            <!-- VIDEO / AUDIO STREAMS -->
+            <div class="card">
+                <div class="card-label">ANRUF & VIDEO (PEER-TO-PEER)</div>
+                <div class="media-grid">
+                    <div class="video-wrapper">
+                        <video id="localVideo" autoplay muted playsinline></video>
+                        <div class="video-label">DU</div>
+                    </div>
+                    <div class="video-wrapper">
+                        <video id="remoteVideo" autoplay playsinline></video>
+                        <div class="video-label" id="peerVideoLabel">PARTNER</div>
+                    </div>
+                </div>
+                <div class="input-group" style="margin-top: 10px;">
+                    <button class="btn btn-full" onclick="startCall(true)">Video Anruf 📹</button>
+                    <button class="btn btn-full" onclick="startCall(false)">Audio Anruf 📞</button>
+                    <button class="btn btn-danger" onclick="hangUp()">Auflegen ❌</button>
+                </div>
             </div>
 
-            <!-- NACHRICHT SCHREIBEN -->
-            <div class="connect-box">
-                <input type="text" id="chatInput" placeholder="Nachricht schreiben...">
-                <button onclick="sendMessage()">Senden</button>
+            <!-- CHAT BOX -->
+            <div class="card">
+                <div class="card-label">ECHTZEIT CHAT (NO LOGS)</div>
+                <div class="chat-box" id="chatBox">
+                    <div class="chat-msg system">System: Bereit für verschlüsselte P2P Übertragung.</div>
+                </div>
+                <div class="input-group" style="margin-top: 10px;">
+                    <input type="text" id="chatInput" placeholder="Nachricht eingeben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                    <button class="btn" onclick="sendChatMessage()">Senden</button>
+                </div>
             </div>
+
         </main>
 
+        <!-- FOOTER -->
         <footer class="app-footer">
-            #NULLSEC P2P NETWORK • ZERO LOGS
+            #NULLSEC NETWORK • ZERO STORAGE • ALL DATA WIPED ON CLOSE
         </footer>
     </div>
 
     <script>
-        // Speicher komplett sperren
+        // Storage Blocking (Zero-Storage Policy)
         try {
             window.localStorage.clear();
             window.sessionStorage.clear();
             Storage.prototype.setItem = function() {};
         } catch(e) {}
 
-        function generateCode() {
-            const code = Math.floor(10000 + Math.random() * 90000);
-            document.getElementById('myCode').innerText = code;
+        let peer = null;
+        let dataConn = null;
+        let mediaCall = null;
+        let localStream = null;
+
+        const nodes = ["Frankfurt", "Zurich", "Amsterdam", "Stockholm", "Reykjavik", "Tokyo"];
+
+        // Dynamic VPN Simulation Loop (5 Sekunden)
+        function rotateVpn() {
+            const randomIp = `${Math.floor(Math.random() * 150 + 40)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+            const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+            document.getElementById('vpnIp').innerText = randomIp;
+            document.getElementById('vpnRoute').innerText = randomNode.toUpperCase();
+        }
+        setInterval(rotateVpn, 5000);
+        rotateVpn();
+
+        // 1. PeerJS Initialisieren
+        function initPeer() {
+            if(peer) peer.destroy();
+            
+            // Erstellt eine zufällige 6-stellige Zahl als ID
+            const customId = "nullsec-" + Math.floor(100000 + Math.random() * 900000);
+            
+            peer = new Peer(customId);
+
+            peer.on('open', (id) => {
+                document.getElementById('myPeerId').innerText = id.replace('nullsec-', '');
+                logSystem(`Deine Anonyme ID erstellt: ${id.replace('nullsec-', '')}`);
+            });
+
+            // Wenn jemand UNS kontaktiert (Chat)
+            peer.on('connection', (conn) => {
+                dataConn = conn;
+                setupChatListeners();
+                logSystem("Partner hat sich verbunden!");
+            });
+
+            // Wenn jemand UNS anruft (Audio/Video)
+            peer.on('call', async (call) => {
+                const acceptCall = confirm("Eingehender P2P-Anruf! Annehmen?");
+                if (acceptCall) {
+                    try {
+                        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                        document.getElementById('localVideo').srcObject = localStream;
+                        call.answer(localStream);
+                        
+                        call.on('stream', (remoteStream) => {
+                            document.getElementById('remoteVideo').srcObject = remoteStream;
+                        });
+                        mediaCall = call;
+                        logSystem("Anruf verbunden!");
+                    } catch(err) {
+                        alert("Zugriff auf Kamera/Mikrofon fehlgeschlagen.");
+                    }
+                }
+            });
+
+            peer.on('error', (err) => {
+                logSystem(`Fehler: ${err.type}`);
+            });
         }
 
-        function connectToFriend() {
-            const code = document.getElementById('friendCode').value;
-            if(code.length < 5) {
-                alert("Bitte gültigen 5-stelligen Code eingeben!");
-                return;
-            }
-            addChatMsg(`Verbindung wird zu Code ${code} aufgebaut...`);
+        // 2. Zu Partner Verbinden (Chat)
+        function connectToPeer() {
+            const inputVal = document.getElementById('targetPeerId').value.trim();
+            if(!inputVal) return alert("Bitte ID vom Freund eingeben!");
+
+            const fullTargetId = "nullsec-" + inputVal;
+            logSystem(`Verbinde zu ${inputVal}...`);
+            
+            dataConn = peer.connect(fullTargetId);
+            setupChatListeners();
         }
 
-        function sendMessage() {
+        // 3. Chat-Events verwalten
+        function setupChatListeners() {
+            dataConn.on('open', () => {
+                logSystem("Chat-Tunnel erfolgreich etabliert!");
+            });
+
+            dataConn.on('data', (data) => {
+                addChatBubble(data, 'peer');
+            });
+
+            dataConn.on('close', () => {
+                logSystem("Verbindung getrennt.");
+            });
+        }
+
+        function sendChatMessage() {
             const input = document.getElementById('chatInput');
-            if(!input.value) return;
-            addChatMsg(`Du: ${input.value}`);
-            input.value = '';
+            const msg = input.value.trim();
+            if(!msg) return;
+
+            if(dataConn && dataConn.open) {
+                dataConn.send(msg);
+                addChatBubble(msg, 'me');
+                input.value = '';
+            } else {
+                alert("Du bist noch mit keinem Partner verbunden!");
+            }
         }
 
-        function addChatMsg(text) {
+        function addChatBubble(text, sender) {
             const box = document.getElementById('chatBox');
-            const msg = document.createElement('div');
-            msg.className = 'chat-msg';
-            msg.innerText = text;
-            box.appendChild(msg);
+            const div = document.createElement('div');
+            div.className = `chat-msg ${sender}`;
+            div.innerText = (sender === 'me' ? 'Du: ' : 'Partner: ') + text;
+            box.appendChild(div);
             box.scrollTop = box.scrollHeight;
         }
 
-        function startCall() {
-            // Fordert Mikrofonausdauer an für Sprache
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(stream => {
-                    addChatMsg("Mikrofon aktiv. Anruf läuft...");
-                })
-                .catch(err => {
-                    addChatMsg("Mikrofon-Zugriff verweigert.");
+        function logSystem(text) {
+            const box = document.getElementById('chatBox');
+            const div = document.createElement('div');
+            div.className = 'chat-msg system';
+            div.innerText = `[SYS] ${text}`;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        // 4. Anruf starten (Audio oder Video)
+        async function startCall(withVideo) {
+            const inputVal = document.getElementById('targetPeerId').value.trim();
+            if(!inputVal) return alert("Gib zuerst die ID deines Freundes ein!");
+
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: withVideo, 
+                    audio: true 
                 });
+                document.getElementById('localVideo').srcObject = localStream;
+
+                const fullTargetId = "nullsec-" + inputVal;
+                mediaCall = peer.call(fullTargetId, localStream);
+
+                mediaCall.on('stream', (remoteStream) => {
+                    document.getElementById('remoteVideo').srcObject = remoteStream;
+                });
+
+                logSystem(`${withVideo ? 'Video' : 'Audio'}-Anruf wird aufgebaut...`);
+            } catch(err) {
+                alert("Mikrofon oder Kamera konnte nicht aktiviert werden.");
+            }
         }
 
-        function endCall() {
-            addChatMsg("Anruf beendet.");
+        // 5. Auflegen
+        function hangUp() {
+            if(mediaCall) mediaCall.close();
+            if(localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            document.getElementById('localVideo').srcObject = null;
+            document.getElementById('remoteVideo').srcObject = null;
+            logSystem("Anruf beendet.");
         }
 
-        window.onload = generateCode;
+        // Beim Laden direkt starten
+        window.addEventListener('DOMContentLoaded', () => {
+            initPeer();
+        });
     </script>
 </body>
 </html>
