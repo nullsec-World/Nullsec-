@@ -7,7 +7,7 @@
   "theme_color": "#050811",
   "icons": [
     {
-      "src": "https://via.placeholder.com/512/00ff88/000000?text=NULLSEC",
+      "src": "https://raw.githubusercontent.com/nullsec-World/Nullsec-/main/icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
