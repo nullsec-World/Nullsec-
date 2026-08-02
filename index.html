@@ -20,7 +20,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
     body { background-color: #030712; color: var(--text-main); height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
-    /* Main Container im App-Look */
     #app-container {
       width: 100%; max-width: 480px; height: 100%; max-height: 900px;
       background: var(--bg-base); display: flex; flex-direction: column;
@@ -31,7 +30,6 @@
       #app-container { border-radius: 16px; height: 92vh; }
     }
 
-    /* Top Header */
     header {
       background: var(--bg-panel); padding: 12px 16px;
       display: flex; justify-content: space-between; align-items: center;
@@ -51,17 +49,14 @@
     }
     .icon-btn:hover { background: var(--accent); color: #000; }
 
-    /* Security Banner */
     #security-banner {
       background: rgba(0, 255, 136, 0.05); border-bottom: 1px solid rgba(0, 255, 136, 0.15);
       padding: 6px; text-align: center; font-size: 0.65rem; color: var(--accent);
       font-weight: 600; letter-spacing: 0.5px;
     }
 
-    /* Layout Content */
     .main-view { display: flex; flex: 1; overflow: hidden; position: relative; }
     
-    /* Sidebar (Kontaktliste) */
     #sidebar {
       width: 100%; background: var(--bg-base); display: flex; flex-direction: column;
       position: absolute; top: 0; left: 0; height: 100%; z-index: 2;
@@ -79,7 +74,7 @@
     .contact-list { flex: 1; overflow-y: auto; }
     .contact-item {
       display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-      cursor: pointer; border-bottom: 1px solid rgba(255,255,136,0.02);
+      cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02);
       transition: background 0.15s;
     }
     .contact-item:hover { background: var(--bg-panel); }
@@ -89,7 +84,6 @@
     .contact-name { font-weight: 600; font-size: 0.9rem; color: #fff; }
     .contact-sub { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    /* Chat Bereich */
     #chat-pane {
       width: 100%; height: 100%; display: flex; flex-direction: column;
       background: #070a14; position: absolute; top: 0; left: 0; z-index: 1;
@@ -129,7 +123,6 @@
     }
     .send-btn:hover { transform: scale(1.05); box-shadow: 0 0 10px var(--accent-glow); }
 
-    /* Modals (Profil & Info) */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
@@ -145,6 +138,14 @@
       border-radius: 8px; color: #fff; font-size: 0.9rem; outline: none; width: 100%;
     }
     .modal-box input:focus { border-color: var(--accent); }
+    
+    .avatar-upload-wrapper {
+      display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer;
+    }
+    .avatar-upload-preview {
+      width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px dashed var(--accent); background: #000;
+    }
+
     .btn-primary {
       background: var(--accent); color: #000; border: none; padding: 12px;
       border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center;
@@ -154,7 +155,6 @@
       padding: 10px; border-radius: 8px; cursor: pointer; text-align: center;
     }
 
-    /* Video Call Overlay */
     #call-screen {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: #000; z-index: 99999; display: none; flex-direction: column; justify-content: space-between; padding: 20px;
@@ -178,16 +178,15 @@
 </head>
 <body>
 
-  <!-- Info Modal (Was macht die Webseite?) -->
+  <!-- Info Modal -->
   <div class="modal-overlay" id="info-modal">
     <div class="modal-box">
       <div class="modal-title">#NULLSEC SYSTEM INFO</div>
       <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">
-        Diese Web-App ist ein rein dezentraler, verschlüsselter P2P-Messenger.
+        Dezentraler, verschlüsselter P2P-Messenger.
         <br><br>
-        • <strong>Keine Server-Speicherung:</strong> Nachrichten fließen direkt Peer-to-Peer über WebRTC von Gerät zu Gerät.<br>
-        • <strong>Chatkontrolle Unmöglich:</strong> Es gibt keine zentrale Datenbank, die überwacht werden kann.<br>
-        • <strong>Eigene Daten:</strong> Profilbilder und Namen werden lokal auf deinem Gerät gespeichert.
+        • <strong>Direkte Verbindung:</strong> Keine Server, die deine Daten speichern.<br>
+        • <strong>Eigene Medien:</strong> Profilbilder werden direkt aus deinen lokalen Fotos ausgewählt und an deine Kontakte übertragen.
       </p>
       <button class="btn-primary" onclick="toggleModal('info-modal', false)">Verstanden</button>
     </div>
@@ -196,15 +195,19 @@
   <!-- Profil Bearbeiten Modal -->
   <div class="modal-overlay" id="profile-modal">
     <div class="modal-box">
-      <div class="modal-title">DEIN PROFIL BEARBEITEN</div>
+      <div class="modal-title">PROFIL BEARBEITEN</div>
+      
+      <div class="avatar-upload-wrapper" onclick="document.getElementById('hidden-file-input').click()">
+        <img id="modal-avatar-preview" class="avatar-upload-preview" src="" alt="Avatar" />
+        <span style="font-size: 0.75rem; color: var(--accent);">Foto aus Galerie wählen</span>
+        <input type="file" id="hidden-file-input" accept="image/*" style="display: none;" onchange="handleImageUpload(event)" />
+      </div>
+
       <div>
         <label style="font-size: 0.75rem; color: var(--text-muted);">Dein Name:</label>
         <input type="text" id="input-my-name" placeholder="Name eingeben..." />
       </div>
-      <div>
-        <label style="font-size: 0.75rem; color: var(--text-muted);">Profilbild (Direkt-Link zu Bild):</label>
-        <input type="text" id="input-my-avatar" placeholder="https://..." />
-      </div>
+      
       <button class="btn-primary" onclick="saveMyProfile()">Speichern</button>
       <button class="btn-secondary" onclick="toggleModal('profile-modal', false)">Abbrechen</button>
     </div>
@@ -225,7 +228,7 @@
   <div id="app-container">
     <!-- Header -->
     <header>
-      <div class="brand-area" onclick="toggleModal('profile-modal', true)">
+      <div class="brand-area" onclick="openProfileModal()">
         <img id="header-avatar" class="my-avatar-preview" src="" alt="Avatar" />
         <div class="brand-info">
           <h1 id="header-name">Lade...</h1>
@@ -240,19 +243,17 @@
 
     <!-- Security Banner -->
     <div id="security-banner">
-      🔒 END-TO-END VERSCHLÜSSELT | CHATKONTROLLE UNMÖGLICH
+      🔒 END-TO-END VERSCHLÜSSELT | FOTOS DIREKT AUS GALERIE
     </div>
 
     <!-- Main View -->
     <div class="main-view">
-      <!-- Sidebar (Kontaktliste) -->
+      <!-- Sidebar -->
       <div id="sidebar">
         <div class="sidebar-search">
           <input type="text" id="new-peer-input" placeholder="Friend-Code eingeben & Enter..." />
         </div>
-        <div class="contact-list" id="contact-list-container">
-          <!-- Dynamische Kontakte -->
-        </div>
+        <div class="contact-list" id="contact-list-container"></div>
       </div>
 
       <!-- Chat Pane -->
@@ -260,7 +261,7 @@
         <div class="chat-header">
           <div class="chat-header-left">
             <button class="back-btn" onclick="closeChatMobile()">←</button>
-            <img id="active-chat-avatar" class="contact-avatar" style="width:36px;height:36px;" src="https://i.imgur.com/8Km9tLL.png" />
+            <img id="active-chat-avatar" class="contact-avatar" style="width:36px;height:36px;" src="" />
             <div>
               <div id="active-chat-name" style="font-weight: 600; font-size: 0.9rem;">Wähle einen Chat</div>
               <div id="active-chat-status" style="font-size: 0.65rem; color: var(--text-muted);">Offline</div>
@@ -285,7 +286,6 @@
   </div>
 
   <script>
-    // Audio Sound Effects
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playBeep(freq, duration) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -298,26 +298,42 @@
       osc.start(); osc.stop(audioCtx.currentTime + duration);
     }
 
-    // Lokaler Speicher für eigenes Profil & Kontakte
     let myProfile = JSON.parse(localStorage.getItem('nullsec_profile')) || {
-      name: "User_" + Math.floor(Math.random() * 9000 + 1000),
-      avatar: "https://i.imgur.com/8Km9tLL.png"
+      name: "Elyas",
+      avatar: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%2300ff88'><circle cx='50' cy='50' r='50'/></svg>"
     };
     let chats = JSON.parse(localStorage.getItem('nullsec_chats')) || {};
     let contactsInfo = JSON.parse(localStorage.getItem('nullsec_contacts_info')) || {};
+    let tempAvatarBase64 = myProfile.avatar;
 
     updateMyProfileUI();
 
     function updateMyProfileUI() {
       document.getElementById('header-name').textContent = myProfile.name;
       document.getElementById('header-avatar').src = myProfile.avatar;
+    }
+
+    function openProfileModal() {
       document.getElementById('input-my-name').value = myProfile.name;
-      document.getElementById('input-my-avatar').value = myProfile.avatar;
+      tempAvatarBase64 = myProfile.avatar;
+      document.getElementById('modal-avatar-preview').src = tempAvatarBase64;
+      toggleModal('profile-modal', true);
+    }
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        tempAvatarBase64 = e.target.result;
+        document.getElementById('modal-avatar-preview').src = tempAvatarBase64;
+      };
+      reader.readAsDataURL(file);
     }
 
     function saveMyProfile() {
       myProfile.name = document.getElementById('input-my-name').value.trim() || "Anonym";
-      myProfile.avatar = document.getElementById('input-my-avatar').value.trim() || "https://i.imgur.com/8Km9tLL.png";
+      myProfile.avatar = tempAvatarBase64;
       localStorage.setItem('nullsec_profile', JSON.stringify(myProfile));
       updateMyProfileUI();
       toggleModal('profile-modal', false);
@@ -330,7 +346,6 @@
       document.getElementById(id).style.display = show ? 'flex' : 'none';
     }
 
-    // PeerJS Setup
     const myId = "nullsec-" + Math.floor(Math.random() * 90000 + 10000);
     const peer = new Peer(myId);
 
@@ -344,9 +359,7 @@
     let localStream = null;
     let currentCall = null;
 
-    peer.on('connection', (conn) => {
-      setupConnection(conn);
-    });
+    peer.on('connection', (conn) => { setupConnection(conn); });
 
     peer.on('call', async (call) => {
       currentCall = call;
@@ -362,7 +375,6 @@
       } catch(e) { alert("Medien-Fehler"); }
     });
 
-    // Enter zum Hinzufügen von Peer
     document.getElementById('new-peer-input').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         const targetId = e.target.value.trim();
@@ -454,12 +466,12 @@
       const keys = Object.keys(chats);
 
       if (keys.length === 0) {
-        container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Keine Chats vorhanden. Klicke oben auf ➕ um jemanden hinzuzufügen.</div>';
+        container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Keine Chats. Oben auf ➕ tippen.</div>';
         return;
       }
 
       keys.forEach(id => {
-        const info = contactsInfo[id] || { name: id, avatar: "https://i.imgur.com/8Km9tLL.png" };
+        const info = contactsInfo[id] || { name: id, avatar: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%23333'><circle cx='50' cy='50' r='50'/></svg>" };
         const lastMsg = chats[id].length > 0 ? chats[id][chats[id].length - 1].text : "Keine Nachrichten";
         
         const div = document.createElement('div');
@@ -489,7 +501,6 @@
       document.getElementById('send-btn').disabled = false;
       document.getElementById('call-buttons-group').style.display = 'flex';
 
-      // Mobile Ansicht umschalten
       if (window.innerWidth <= 480) {
         document.getElementById('sidebar').classList.add('mobile-hidden');
       }
@@ -501,7 +512,7 @@
     }
 
     function updateChatHeaderInfo() {
-      const info = contactsInfo[activePeerId] || { name: activePeerId, avatar: "https://i.imgur.com/8Km9tLL.png" };
+      const info = contactsInfo[activePeerId] || { name: activePeerId, avatar: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%23333'><circle cx='50' cy='50' r='50'/></svg>" };
       document.getElementById('active-chat-name').textContent = info.name;
       document.getElementById('active-chat-avatar').src = info.avatar;
     }
