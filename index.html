@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Power BY #NULLSEC - Encrypted Messenger</title>
-  <!-- PeerJS Library für echte P2P-Verbindung -->
+  <title>Power BY #NULLSEC - Secure Messenger</title>
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
@@ -16,74 +15,97 @@
       justify-content: center; align-items: center; z-index: 999;
       transition: opacity 0.8s ease, visibility 0.8s ease;
     }
-    .brand-title {
-      font-size: 2.2rem; font-weight: bold; color: #00ff88;
-      text-shadow: 0 0 15px rgba(0, 255, 136, 0.8); text-align: center; padding: 0 20px;
-    }
+    .brand-title { font-size: 2.2rem; font-weight: bold; color: #00ff88; text-shadow: 0 0 15px rgba(0, 255, 136, 0.8); text-align: center; padding: 0 20px; }
     .status-text { margin-top: 20px; font-size: 0.85rem; color: #888; }
 
-    #app-container {
-      display: flex; flex-direction: column; height: 100vh; max-width: 600px;
-      margin: 0 auto; width: 100%; border-left: 1px solid #112211; border-right: 1px solid #112211;
-      opacity: 0; transition: opacity 0.5s ease;
-    }
-    header { padding: 15px; background-color: #0a0d12; border-bottom: 1px solid #00ff8833; display: flex; justify-content: space-between; align-items: center; }
-    .header-brand { font-weight: bold; font-size: 1.1rem; color: #00ff88; }
-    .badge-vpn { font-size: 0.75rem; background: rgba(0, 255, 136, 0.1); border: 1px solid #00ff88; padding: 3px 8px; border-radius: 4px; color: #00ff88; }
-
-    #connect-screen { padding: 20px; display: flex; flex-direction: column; gap: 15px; background: #080a0f; border-bottom: 1px solid #112211; }
-    .my-code-box { background: #0d121c; padding: 10px; border: 1px dashed #00ff8866; border-radius: 6px; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+    #app-container { display: flex; flex-direction: column; height: 100vh; max-width: 600px; margin: 0 auto; width: 100%; border-left: 1px solid #112211; border-right: 1px solid #112211; opacity: 0; transition: opacity 0.5s ease; }
     
-    input[type="text"] { width: 100%; padding: 12px; background-color: #05070a; border: 1px solid #00ff8844; border-radius: 6px; color: #fff; font-family: inherit; outline: none; }
-    input[type="text"]:focus { border-color: #00ff88; box-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
-    button { padding: 12px; background: #00ff88; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; }
+    header { padding: 10px 15px; background-color: #0a0d12; border-bottom: 1px solid #00ff8833; display: flex; justify-content: space-between; align-items: center; }
+    .header-brand { font-weight: bold; font-size: 1rem; color: #00ff88; }
+    .header-btns { display: flex; gap: 6px; }
+    .btn-small { font-size: 0.7rem; background: rgba(0, 255, 136, 0.1); border: 1px solid #00ff88; padding: 4px 8px; border-radius: 4px; color: #00ff88; cursor: pointer; text-decoration: none; }
 
-    #chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background-color: #040507; }
-    .message { max-width: 80%; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; line-height: 1.4; word-break: break-word; }
+    /* Security Banner */
+    #security-banner { background-color: #020804; border-bottom: 1px dashed #00ff8844; padding: 5px; text-align: center; font-size: 0.65rem; color: #00ff88; letter-spacing: 1px; }
+
+    /* Main Layout with Sidebar Switcher */
+    #main-layout { display: flex; flex: 1; overflow: hidden; position: relative; }
+    
+    #sidebar { width: 140px; background: #06080c; border-right: 1px solid #112211; display: flex; flex-direction: column; padding: 10px; gap: 6px; overflow-y: auto; }
+    .sidebar-title { font-size: 0.7rem; color: #666; margin-bottom: 4px; }
+    .chat-contact-item { padding: 8px; background: #0d121c; border: 1px solid #112211; border-radius: 4px; font-size: 0.75rem; color: #aaa; cursor: pointer; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+    .chat-contact-item.active { border-color: #00ff88; color: #00ff88; background: #0c1a14; }
+
+    #chat-pane { flex: 1; display: flex; flex-direction: column; background-color: #040507; }
+
+    #connect-bar { padding: 10px; background: #080a0f; border-bottom: 1px solid #112211; display: flex; flex-direction: column; gap: 8px; }
+    .my-code-box { font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; color: #aaa; }
+    
+    input[type="text"] { width: 100%; padding: 10px; background-color: #05070a; border: 1px solid #00ff8844; border-radius: 6px; color: #fff; font-family: inherit; outline: none; font-size: 0.85rem; }
+    input[type="text"]:focus { border-color: #00ff88; box-shadow: 0 0 8px rgba(0, 255, 136, 0.3); }
+    button.action-btn { padding: 10px; background: #00ff88; color: #000; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; font-family: inherit; }
+
+    #chat-box { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .message { max-width: 85%; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; line-height: 1.4; word-break: break-word; }
     .message.sent { align-self: flex-end; background-color: #004d28; color: #e0ffe0; border: 1px solid #00ff8844; }
-    .message.received { align-self: flex-start; background-color: #0f1520; color: #aaa; border: 1px solid #223344; }
-    .message.system { align-self: center; background-color: transparent; color: #00ff88; font-size: 0.75rem; border: none; }
-    .message .time { font-size: 0.65rem; opacity: 0.5; margin-top: 4px; text-align: right; }
+    .message.received { align-self: flex-start; background-color: #0f1520; color: #ccc; border: 1px solid #223344; }
+    .message.system { align-self: center; background-color: transparent; color: #00ff88; font-size: 0.7rem; border: none; text-align: center; }
+    .message .time { font-size: 0.6rem; opacity: 0.5; margin-top: 3px; text-align: right; }
 
-    #input-area { padding: 15px; background-color: #0a0d12; display: flex; gap: 10px; border-top: 1px solid #112211; }
+    #input-area { padding: 10px; background-color: #0a0d12; display: flex; gap: 8px; border-top: 1px solid #112211; }
   </style>
 </head>
 <body>
 
   <div id="splash-screen">
     <div class="brand-title">Power BY #NULLSEC</div>
-    <div class="status-text" id="status-text">> Verbinde mit P2P Network...</div>
+    <div class="status-text">> Lade sichere Protokolle...</div>
   </div>
 
   <div id="app-container">
     <header>
-      <div class="header-brand">Power BY #NULLSEC</div>
-      <div class="badge-vpn" id="conn-status">DISCONNECTED</div>
+      <div class="header-brand">#NULLSEC P2P</div>
+      <div class="header-btns">
+        <button class="btn-small" onclick="downloadAppAsAPK()">APK Info</button>
+        <div class="btn-small" id="conn-status" style="border-color:#ff4444; color:#ff4444;">OFFLINE</div>
+      </div>
     </header>
 
-    <div id="connect-screen">
-      <div class="my-code-box">
-        <span>Dein Code:</span>
-        <strong id="my-code" style="color: #fff;">Generiere...</strong>
-      </div>
-      <div style="display: flex; gap: 8px;">
-        <input type="text" id="target-code-input" placeholder="Friend-Code eingeben..." />
-        <button id="btn-connect">Verbinden</button>
-      </div>
+    <div id="security-banner">
+      [🔒 END-TO-END VERSCHLÜSSELT | CHATKONTROLLE UNMÖGLICH]
     </div>
 
-    <div id="chat-box">
-      <div class="message system">Warte auf P2P-Initialisierung...</div>
-    </div>
+    <div id="main-layout">
+      <!-- Sidebar für Chat-Historie / Kontakte -->
+      <div id="sidebar">
+        <div class="sidebar-title">CHATS</div>
+        <div id="contact-list"></div>
+      </div>
 
-    <div id="input-area">
-      <input type="text" id="msg-input" placeholder="Anonyme Nachricht..." disabled />
-      <button id="btn-send" disabled>Senden</button>
+      <div id="chat-pane">
+        <div id="connect-bar">
+          <div class="my-code-box">
+            <span>Dein Code: <strong id="my-code" style="color:#fff;">...</strong></span>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <input type="text" id="target-code-input" placeholder="Friend-Code..." />
+            <button class="action-btn" id="btn-connect" style="padding: 10px 15px;">Add</button>
+          </div>
+        </div>
+
+        <div id="chat-box">
+          <div class="message system">Wähle oder addie einen Friend-Code.</div>
+        </div>
+
+        <div id="input-area">
+          <input type="text" id="msg-input" placeholder="Nachricht..." disabled />
+          <button class="action-btn" id="btn-send" disabled>Senden</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    // Audio FX
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playSound(freq, type, duration) {
       if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -91,7 +113,7 @@
       const gain = audioCtx.createGain();
       osc.type = type;
       osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
@@ -99,47 +121,61 @@
       osc.stop(audioCtx.currentTime + duration);
     }
 
-    // Splash animation
     setTimeout(() => {
       document.getElementById('splash-screen').style.opacity = '0';
       document.getElementById('splash-screen').style.visibility = 'hidden';
       document.getElementById('app-container').style.opacity = '1';
-    }, 2000);
+    }, 1500);
 
-    // P2P Logic mit PeerJS
     let peer = null;
-    let conn = null;
+    let activeConnection = null;
+    let activePeerId = null;
 
-    // Generiere zufällige 4-stellige ID
+    // Speicher laden (Chats im LocalStorage)
+    let chats = JSON.parse(localStorage.getItem('nullsec_chats')) || {};
+
     const randomId = "nullsec-" + Math.floor(1000 + Math.random() * 9000);
     peer = new Peer(randomId);
 
     peer.on('open', (id) => {
       document.getElementById('my-code').textContent = id;
-      addSystemMessage("Bereit. Dein Code ist: " + id);
+      renderContactList();
     });
 
-    // Inbound connection (Jemand verbindet sich mit DIR)
+    // Wenn sich jemand bei dir meldet
     peer.on('connection', (incomingConn) => {
-      conn = incomingConn;
-      setupChatConnection();
-      addSystemMessage("Partner hat sich verbunden!");
+      setupConnection(incomingConn);
     });
 
-    // Outbound connection (DU verbindest dich mit jemandem)
+    // Verbindung zu Ziel-ID aufbauen
     document.getElementById('btn-connect').addEventListener('click', () => {
       const targetId = document.getElementById('target-code-input').value.trim();
-      if (!targetId) return alert("Bitte Code eingeben!");
+      if (!targetId || targetId === peer.id) return alert("Ungültiger Code!");
       
-      addSystemMessage("Verbinde mit " + targetId + "...");
-      conn = peer.connect(targetId);
-      setupChatConnection();
+      connectToPeer(targetId);
     });
 
-    function setupChatConnection() {
+    function connectToPeer(targetId) {
+      if (activeConnection) activeConnection.close();
+      const conn = peer.connect(targetId);
+      setupConnection(conn);
+    }
+
+    function setupConnection(conn) {
+      activeConnection = conn;
+      activePeerId = conn.peer;
+
+      if (!chats[activePeerId]) {
+        chats[activePeerId] = [];
+        saveChats();
+      }
+      renderContactList();
+      switchToChat(activePeerId);
+
       conn.on('open', () => {
-        document.getElementById('conn-status').textContent = "CONNECTED";
+        document.getElementById('conn-status').textContent = "ONLINE";
         document.getElementById('conn-status').style.borderColor = "#00ff88";
+        document.getElementById('conn-status').style.color = "#00ff88";
         document.getElementById('msg-input').disabled = false;
         document.getElementById('btn-send').disabled = false;
         playSound(800, 'sine', 0.15);
@@ -147,25 +183,23 @@
 
       conn.on('data', (data) => {
         playSound(500, 'triangle', 0.1);
-        appendMessage(data, 'received');
+        appendMessageToChat(activePeerId, data, 'received');
       });
 
       conn.on('close', () => {
-        document.getElementById('conn-status').textContent = "DISCONNECTED";
-        addSystemMessage("Verbindung getrennt.");
-        document.getElementById('msg-input').disabled = true;
-        document.getElementById('btn-send').disabled = true;
+        document.getElementById('conn-status').textContent = "OFFLINE";
+        document.getElementById('conn-status').style.borderColor = "#ff4444";
+        document.getElementById('conn-status').style.color = "#ff4444";
       });
     }
 
-    // Nachricht senden
     function sendMessage() {
       const input = document.getElementById('msg-input');
       const text = input.value.trim();
-      if (!text || !conn) return;
+      if (!text || !activeConnection || !activePeerId) return;
 
-      conn.send(text);
-      appendMessage(text, 'sent');
+      activeConnection.send(text);
+      appendMessageToChat(activePeerId, text, 'sent');
       playSound(600, 'square', 0.08);
       input.value = '';
     }
@@ -175,23 +209,76 @@
       if (e.key === 'Enter') sendMessage();
     });
 
-    function appendMessage(text, type) {
+    function appendMessageToChat(peerId, text, type) {
+      if (!chats[peerId]) chats[peerId] = [];
+      chats[peerId].push({ text, type, time: new Date().toLocaleTimeString([], { hour: '2-2-digit', minute: '2-2-digit' }) });
+      saveChats();
+      if (activePeerId === peerId) {
+        renderActiveChat();
+      }
+      renderContactList();
+    }
+
+    function saveChats() {
+      localStorage.setItem('nullsec_chats', JSON.stringify(chats));
+    }
+
+    function renderContactList() {
+      const list = document.getElementById('contact-list');
+      list.innerHTML = '';
+      const keys = Object.keys(chats);
+      
+      if (keys.length === 0) {
+        list.innerHTML = '<div style="font-size:0.65rem; color:#444;">Keine Chats</div>';
+        return;
+      }
+
+      keys.forEach(id => {
+        const div = document.createElement('div');
+        div.className = `chat-contact-item ${activePeerId === id ? 'active' : ''}`;
+        div.textContent = id;
+        div.onclick = () => {
+          activePeerId = id;
+          if (peer && peer.connections[id] && peer.connections[id].length > 0) {
+            activeConnection = peer.connections[id][0];
+          } else {
+            // Versuche Verbindung aufzubauen wenn man draufklickt
+            connectToPeer(id);
+          }
+          renderContactList();
+          renderActiveChat();
+        };
+        list.appendChild(div);
+      });
+    }
+
+    function renderActiveChat() {
       const box = document.getElementById('chat-box');
-      const timeStr = new Date().toLocaleTimeString([], { hour: '2-2-digit', minute: '2-2-digit' });
-      const div = document.createElement('div');
-      div.className = `message ${type}`;
-      div.innerHTML = `${escapeHtml(text)} <div class="time">${timeStr}</div>`;
-      box.appendChild(div);
+      box.innerHTML = '';
+      if (!activePeerId || !chats[activePeerId]) {
+        box.innerHTML = '<div class="message system">Wähle einen Chat aus.</div>';
+        return;
+      }
+
+      chats[activePeerId].forEach(msg => {
+        const div = document.createElement('div');
+        div.className = `message ${msg.type}`;
+        div.innerHTML = `${escapeHtml(msg.text)} <div class="time">${msg.time}</div>`;
+        box.appendChild(div);
+      });
       box.scrollTop = box.scrollHeight;
     }
 
-    function addSystemMessage(text) {
-      const box = document.getElementById('chat-box');
-      const div = document.createElement('div');
-      div.className = 'message system';
-      div.textContent = "> " + text;
-      box.appendChild(div);
-      box.scrollTop = box.scrollHeight;
+    function switchToChat(peerId) {
+      activePeerId = peerId;
+      renderContactList();
+      renderActiveChat();
+      document.getElementById('msg-input').disabled = false;
+      document.getElementById('btn-send').disabled = false;
+    }
+
+    function downloadAppAsAPK() {
+      alert("APK-Info:\n\nDa dies eine Web-App (PWA) ist, kannst du sie direkt auf deinem Android-Handy als App installieren:\n1. Öffne das Chrome-Menü (3 Punkte oben rechts).\n2. Wähle 'Zum Startbildschirm hinzufügen' oder 'App installieren'.\n\nDadurch verhält sie sich wie eine echte APK-App auf deinem Homescreen!");
     }
 
     function escapeHtml(str) {
