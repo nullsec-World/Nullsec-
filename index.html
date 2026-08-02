@@ -2,27 +2,27 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- RAM-ONLY SECURITY: Keinerlei Caching erlaubt -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- ZERO STORAGE & FAST CACHE POLICY -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>#NULLSEC • Hyper-Fast P2P Encrypted Terminal</title>
+    <title>#NULLSEC • Instant Ultra P2P Terminal</title>
     
-    <!-- PeerJS Framework & QR Code Generator -->
+    <!-- Frameworks -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         /* ==========================================================================
-           CYBERPUNK NEON ULTRA STYLING (DESIGN SYSTEM)
+           HYPER-CYBERPUNK NEON DESIGN SYSTEM
            ========================================================================== */
         :root {
             --bg-dark: #020617;
             --panel-bg: rgba(15, 23, 42, 0.85);
-            --panel-border: rgba(0, 255, 204, 0.2);
+            --panel-border: rgba(0, 255, 204, 0.25);
             --neon-green: #00ffcc;
-            --neon-glow: rgba(0, 255, 204, 0.35);
+            --neon-glow: rgba(0, 255, 204, 0.4);
             --neon-dim: rgba(0, 255, 204, 0.08);
             --neon-red: #ff0055;
             --neon-blue: #00bfff;
@@ -36,6 +36,7 @@
             margin: 0;
             padding: 0;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -45,13 +46,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 16px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-image: 
                 linear-gradient(rgba(0, 255, 204, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 255, 204, 0.03) 1px, transparent 1px),
-                radial-gradient(circle at 50% 0%, var(--neon-glow) 0%, transparent 75%);
-            background-size: 30px 30px, 30px 30px, 100% 100%;
+                radial-gradient(circle at 50% 0%, var(--neon-glow) 0%, transparent 85%);
+            background-size: 25px 25px, 25px 25px, 100% 100%;
             background-attachment: fixed;
             overflow-x: hidden;
         }
@@ -62,7 +63,7 @@
             background: var(--panel-bg);
             border: 1px solid var(--panel-border);
             border-radius: 28px;
-            box-shadow: 0 0 50px rgba(0, 255, 204, 0.15), inset 0 0 20px rgba(0, 255, 204, 0.05);
+            box-shadow: 0 0 60px rgba(0, 255, 204, 0.15), inset 0 0 20px rgba(0, 255, 204, 0.05);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             overflow: hidden;
@@ -73,27 +74,11 @@
             position: relative;
         }
 
-        .app-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--neon-green), transparent);
-            animation: scanline 4s linear infinite;
-        }
-
-        @keyframes scanline {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
         .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 16px;
+            padding-bottom: 14px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
@@ -126,12 +111,12 @@
             background: var(--neon-green);
             border-radius: 50%;
             box-shadow: 0 0 10px var(--neon-green);
-            animation: pulse 1.2s infinite;
+            animation: pulse 1s infinite;
         }
 
         @keyframes pulse {
             0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 0.2; transform: scale(0.7); }
             100% { opacity: 1; transform: scale(1); }
         }
 
@@ -168,25 +153,25 @@
 
         .code-display {
             font-family: var(--font-mono);
-            font-size: 2.4rem;
+            font-size: 2.5rem;
             font-weight: 900;
             color: var(--neon-green);
             letter-spacing: 8px;
             text-align: center;
             text-shadow: 0 0 20px var(--neon-glow);
-            padding: 10px;
+            padding: 12px;
             width: 100%;
             background: rgba(0, 255, 204, 0.03);
             border-radius: 14px;
-            border: 1px dashed rgba(0, 255, 204, 0.25);
+            border: 1px dashed rgba(0, 255, 204, 0.3);
         }
 
         #qrcode {
             background: #fff;
-            padding: 10px;
-            border-radius: 12px;
+            padding: 12px;
+            border-radius: 14px;
             display: none;
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
         }
 
         .input-group {
@@ -265,43 +250,8 @@
             width: 100%;
         }
 
-        .media-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .video-wrapper {
-            position: relative;
-            aspect-ratio: 4/3;
-            background: #000;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
-        }
-
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .video-tag {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            font-size: 0.65rem;
-            font-family: var(--font-mono);
-            background: rgba(0, 0, 0, 0.8);
-            padding: 3px 10px;
-            border-radius: 8px;
-            color: var(--neon-green);
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(0, 255, 204, 0.2);
-        }
-
         .chat-box {
-            height: 160px;
+            height: 180px;
             background: rgba(2, 6, 23, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 14px;
@@ -343,29 +293,145 @@
             background: transparent;
         }
 
+        /* ==========================================================================
+           WHATSAPP-STYLE FULLSCREEN CALL OVERLAY
+           ========================================================================== */
+        .call-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .call-overlay.active {
+            display: flex;
+        }
+
+        .remote-video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #fullscreenRemoteVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .local-video-container {
+            position: absolute;
+            top: 30px;
+            right: 20px;
+            width: 110px;
+            height: 160px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid var(--neon-green);
+            border-radius: 16px;
+            overflow: hidden;
+            z-index: 2;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
+        }
+
+        #fullscreenLocalVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .call-header-info {
+            position: relative;
+            z-index: 3;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            background: rgba(2, 6, 23, 0.6);
+            padding: 10px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .call-partner-name {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--neon-green);
+        }
+
+        .call-timer {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .call-controls {
+            position: relative;
+            z-index: 3;
+            margin-bottom: 40px;
+            display: flex;
+            gap: 20px;
+            background: rgba(2, 6, 23, 0.75);
+            padding: 16px 28px;
+            border-radius: 40px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .call-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .call-btn-mute { background: rgba(255, 255, 255, 0.15); color: #fff; }
+        .call-btn-video { background: rgba(255, 255, 255, 0.15); color: #fff; }
+        .call-btn-hangup { background: var(--neon-red); color: #fff; box-shadow: 0 0 20px rgba(255, 0, 85, 0.6); }
+
+        .call-btn:active { transform: scale(0.9); }
+
         .app-footer {
             text-align: center;
             font-size: 0.65rem;
             font-family: var(--font-mono);
             color: var(--text-muted);
             letter-spacing: 1.5px;
-            padding-top: 8px;
+            padding-top: 4px;
         }
     </style>
 </head>
 <body>
 
+    <!-- MAIN TERMINAL APP -->
     <div class="app-container">
-        <!-- HEADER -->
         <header class="app-header">
             <div class="brand-title">#NULLSEC</div>
             <div class="status-badge">
                 <div class="pulse-dot"></div>
-                RAM-ONLY / P2P
+                INSTANT P2P
             </div>
         </header>
 
-        <!-- CODE GENERATOR & QR -->
+        <!-- CODE GENERATOR -->
         <div class="card">
             <div class="card-title">DEINE ANONYME VERBINDUNGS-ID</div>
             <div class="code-display-box">
@@ -378,7 +444,7 @@
             </div>
         </div>
 
-        <!-- FAST CONNECT -->
+        <!-- CONNECT BOX -->
         <div class="card">
             <div class="card-title">BLITZ-VERBINDUNG</div>
             <div class="input-group">
@@ -387,23 +453,12 @@
             </div>
         </div>
 
-        <!-- MEDIA CALLS -->
+        <!-- QUICK CALL TRIGGER -->
         <div class="card">
-            <div class="card-title">REALTIME MEDIA STREAM</div>
-            <div class="media-grid">
-                <div class="video-wrapper">
-                    <video id="localVideo" autoplay muted playsinline></video>
-                    <div class="video-tag">DU</div>
-                </div>
-                <div class="video-wrapper">
-                    <video id="remoteVideo" autoplay playsinline></video>
-                    <div class="video-tag">PARTNER</div>
-                </div>
-            </div>
-            <div class="input-group" style="margin-top: 8px;">
-                <button class="btn btn-full" onclick="startCall(true)">📹 VIDEO</button>
-                <button class="btn btn-full" onclick="startCall(false)">📞 AUDIO</button>
-                <button class="btn btn-danger" onclick="hangUp()">❌</button>
+            <div class="card-title">REALTIME ANRUF</div>
+            <div class="input-group">
+                <button class="btn btn-full" onclick="startCall(true)">📹 VIDEO ANRUF</button>
+                <button class="btn btn-full" onclick="startCall(false)">📞 AUDIO ANRUF</button>
             </div>
         </div>
 
@@ -411,7 +466,7 @@
         <div class="card">
             <div class="card-title">FLÜCHTIGER RAM-CHAT</div>
             <div class="chat-box" id="chatBox">
-                <div class="chat-msg system">System: High-Speed Direct Tunnel initialisiert.</div>
+                <div class="chat-msg system">System: Ultra-Fast High Priority Direct Tunnel initialisiert.</div>
             </div>
             <div class="input-group">
                 <input type="text" id="chatInput" placeholder="Nachricht eingeben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
@@ -419,17 +474,40 @@
             </div>
         </div>
 
-        <!-- FOOTER -->
         <footer class="app-footer">
             E2E ENCRYPTED • ZERO LOGS • DIRECT P2P TUNNEL
         </footer>
     </div>
 
     <!-- ==========================================================================
-       JAVASCRIPT LOGIC & HIGH-SPEED NETWORKING
+       WHATSAPP-STYLE FULLSCREEN VIDEO OVERLAY
+       ========================================================================== -->
+    <div class="call-overlay" id="callOverlay">
+        <div class="remote-video-container">
+            <video id="fullscreenRemoteVideo" autoplay playsinline></video>
+        </div>
+
+        <div class="local-video-container">
+            <video id="fullscreenLocalVideo" autoplay muted playsinline></video>
+        </div>
+
+        <div class="call-header-info">
+            <div class="call-partner-name" id="callPartnerId">ANRUF AKTIV</div>
+            <div class="call-timer" id="callTimer">00:00</div>
+        </div>
+
+        <div class="call-controls">
+            <button class="call-btn call-btn-mute" id="btnMuteAudio" onclick="toggleAudio()">🎙️</button>
+            <button class="call-btn call-btn-video" id="btnMuteVideo" onclick="toggleVideo()">📹</button>
+            <button class="call-btn call-btn-hangup" onclick="hangUp()">❌</button>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       HIGH-SPEED SIGNALING & P2P LOGIC
        ========================================================================== -->
     <script>
-        // STRICT ZERO-STORAGE GUARANTEE (Blockiert Speicherzugriffe im Browser)
+        // RAM-ONLY MEMORY PROTECTION
         try {
             window.localStorage.clear();
             window.sessionStorage.clear();
@@ -441,12 +519,16 @@
         let dataConn = null;
         let mediaCall = null;
         let localStream = null;
+        let timerInterval = null;
+        let callSeconds = 0;
 
-        // Auto-Initialization mit High-Speed ICE Candidate Tuning
+        let isAudioMuted = false;
+        let isVideoMuted = false;
+
+        // HIGH-SPEED STUN & PEER INITIALIZATION
         function initPeer() {
             if(peer) peer.destroy();
             
-            // Hash aus der URL auslesen (#nullsec-XXXXXX)
             const urlHash = window.location.hash.replace('#', '');
             const randomCode = (urlHash && urlHash.includes('nullsec-')) 
                 ? urlHash.replace('nullsec-', '') 
@@ -460,7 +542,6 @@
                     iceServers: [
                         { urls: 'stun:stun.l.google.com:19302' },
                         { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:stun2.l.google.com:19302' },
                         { urls: 'stun:stun.cloudflare.com:3478' }
                     ],
                     iceCandidatePoolSize: 10
@@ -470,14 +551,13 @@
             peer.on('open', (id) => {
                 document.getElementById('myPeerId').innerText = randomCode;
                 generateQRCode(randomCode);
-                logSystem(`Sicherer RAM-Tunnel aktiv. Code: ${randomCode}`);
+                logSystem(`Sicherer Tunnel aktiv. ID: ${randomCode}`);
 
-                // Auto-Connect Trigger bei Direkt-Link
                 if (urlHash && urlHash !== fullId && urlHash.startsWith('nullsec-')) {
                     const targetCode = urlHash.replace('nullsec-', '');
                     document.getElementById('targetPeerId').value = targetCode;
                     logSystem(`Blitz-Link erkannt! Verbinde zu ${targetCode}...`);
-                    setTimeout(() => connectToPeer(), 300);
+                    setTimeout(() => connectToPeer(), 100);
                 }
             });
 
@@ -487,37 +567,36 @@
                 logSystem("⚡ BLITZ-VERBINDUNG HERGESTELLT!");
             });
 
+            // EINGEHENDER ANRUF (WHATSAPP-STYLE VOLLBILD)
             peer.on('call', async (call) => {
-                const acceptCall = confirm("Eingehender Anruf! Annehmen?");
+                const acceptCall = confirm("Eingehender Video-Anruf! Annehmen?");
                 if (acceptCall) {
                     try {
                         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                        document.getElementById('localVideo').srcObject = localStream;
+                        document.getElementById('fullscreenLocalVideo').srcObject = localStream;
                         call.answer(localStream);
                         
                         call.on('stream', (remoteStream) => {
-                            document.getElementById('remoteVideo').srcObject = remoteStream;
+                            document.getElementById('fullscreenRemoteVideo').srcObject = remoteStream;
                         });
+
                         mediaCall = call;
-                        logSystem("Anruf aktiv!");
+                        openCallOverlay();
+                        logSystem("Anruf gestartet.");
                     } catch(err) {
                         alert("Zugriff auf Kamera/Mikrofon verweigert.");
                     }
                 }
             });
-
-            peer.on('error', (err) => {
-                logSystem(`Verbindungs-Status: Suche Partner...`);
-            });
         }
 
-        // Blitz-Verbindung aufbauen
+        // INSTANT CONNECT
         function connectToPeer() {
             const inputVal = document.getElementById('targetPeerId').value.trim();
             if(!inputVal || inputVal.length < 6) return alert("Gib den 6-stelligen Code ein!");
 
             const fullTargetId = "nullsec-" + inputVal;
-            logSystem(`Verbinde zu ${inputVal}...`);
+            logSystem(`Verbinde blitzschnell zu ${inputVal}...`);
             
             dataConn = peer.connect(fullTargetId, { reliable: true });
             setupChatListeners();
@@ -525,7 +604,7 @@
 
         function setupChatListeners() {
             dataConn.on('open', () => {
-                logSystem("⚡ Tunnel aktiv! Kommunikation läuft live über RAM.");
+                logSystem("⚡ Tunnel aktiv! Nachrichten fliegen durch den RAM.");
             });
 
             dataConn.on('data', (data) => {
@@ -569,34 +648,7 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // Link mit Auto-Connect kopieren
-        function copyFastLink() {
-            const currentCode = document.getElementById('myPeerId').innerText;
-            if(currentCode === '------') return;
-            
-            const fastUrl = window.location.origin + window.location.pathname + '#nullsec-' + currentCode;
-            navigator.clipboard.writeText(fastUrl);
-            alert("⚡ Blitz-Link kopiert! Sobald dein Kumpel den Link öffnet, verbindet ihr euch sofort.");
-        }
-
-        // QR Code Generator & Toggle
-        function generateQRCode(code) {
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = '';
-            const fastUrl = window.location.origin + window.location.pathname + '#nullsec-' + code;
-            new QRCode(qrContainer, {
-                text: fastUrl,
-                width: 128,
-                height: 128
-            });
-        }
-
-        function toggleQR() {
-            const qr = document.getElementById('qrcode');
-            qr.style.display = (qr.style.display === 'block') ? 'none' : 'block';
-        }
-
-        // Realtime Video / Audio Calls
+        // ANRUF STARTEN & VOLLBILD ANZEIGEN
         async function startCall(withVideo) {
             const inputVal = document.getElementById('targetPeerId').value.trim();
             if(!inputVal) return alert("Gib erst den Code deines Freundes ein!");
@@ -606,19 +658,36 @@
                     video: withVideo, 
                     audio: true 
                 });
-                document.getElementById('localVideo').srcObject = localStream;
+                document.getElementById('fullscreenLocalVideo').srcObject = localStream;
 
                 const fullTargetId = "nullsec-" + inputVal;
                 mediaCall = peer.call(fullTargetId, localStream);
 
                 mediaCall.on('stream', (remoteStream) => {
-                    document.getElementById('remoteVideo').srcObject = remoteStream;
+                    document.getElementById('fullscreenRemoteVideo').srcObject = remoteStream;
                 });
 
-                logSystem("Anruf wird aufgebaut...");
+                openCallOverlay();
+                logSystem("Anruf aufgebaut...");
             } catch(err) {
                 alert("Kamera oder Mikrofon konnte nicht gestartet werden.");
             }
+        }
+
+        // FULLSCREEN OVERLAY MANAGEMENT
+        function openCallOverlay() {
+            const targetId = document.getElementById('targetPeerId').value.trim() || "PARTNER";
+            document.getElementById('callPartnerId').innerText = "#" + targetId;
+            document.getElementById('callOverlay').classList.add('active');
+            
+            callSeconds = 0;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                callSeconds++;
+                const mins = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+                const secs = String(callSeconds % 60).padStart(2, '0');
+                document.getElementById('callTimer').innerText = `${mins}:${secs}`;
+            }, 1000);
         }
 
         function hangUp() {
@@ -626,12 +695,50 @@
             if(localStream) {
                 localStream.getTracks().forEach(track => track.stop());
             }
-            document.getElementById('localVideo').srcObject = null;
-            document.getElementById('remoteVideo').srcObject = null;
+            document.getElementById('fullscreenLocalVideo').srcObject = null;
+            document.getElementById('fullscreenRemoteVideo').srcObject = null;
+            document.getElementById('callOverlay').classList.remove('active');
+            clearInterval(timerInterval);
             logSystem("Anruf beendet.");
         }
 
-        // App Start
+        function toggleAudio() {
+            if(localStream) {
+                isAudioMuted = !isAudioMuted;
+                localStream.getAudioTracks()[0].enabled = !isAudioMuted;
+                document.getElementById('btnMuteAudio').innerText = isAudioMuted ? "🔇" : "🎙️";
+            }
+        }
+
+        function toggleVideo() {
+            if(localStream && localStream.getVideoTracks().length > 0) {
+                isVideoMuted = !isVideoMuted;
+                localStream.getVideoTracks()[0].enabled = !isVideoMuted;
+                document.getElementById('btnMuteVideo').innerText = isVideoMuted ? "🚫" : "📹";
+            }
+        }
+
+        // LINK & QR CODE
+        function copyFastLink() {
+            const currentCode = document.getElementById('myPeerId').innerText;
+            if(currentCode === '------') return;
+            const fastUrl = window.location.origin + window.location.pathname + '#nullsec-' + currentCode;
+            navigator.clipboard.writeText(fastUrl);
+            alert("⚡ Blitz-Link kopiert!");
+        }
+
+        function generateQRCode(code) {
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
+            const fastUrl = window.location.origin + window.location.pathname + '#nullsec-' + code;
+            new QRCode(qrContainer, { text: fastUrl, width: 128, height: 128 });
+        }
+
+        function toggleQR() {
+            const qr = document.getElementById('qrcode');
+            qr.style.display = (qr.style.display === 'block') ? 'none' : 'block';
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             initPeer();
         });
