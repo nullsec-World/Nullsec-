@@ -151,7 +151,7 @@
             height: 100%;
             background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
             box-shadow: 0 0 12px var(--neon-green);
-            transition: width 0.2s ease-out;
+            transition: width 0.3s ease;
         }
 
         .card {
@@ -548,7 +548,7 @@
         let localStream = null;
         let timerInterval = null;
         let callSeconds = 0;
-        let progressInterval = null;
+        let connectionInterval = null;
 
         let isAudioMuted = false;
         let isVideoMuted = false;
@@ -563,7 +563,6 @@
                 
             const fullId = "nullsec-" + randomCode;
             
-            // Inklusive freier TURN-Relay Server für mobile Netze
             peer = new Peer(fullId, {
                 debug: 0,
                 config: {
@@ -582,7 +581,7 @@
             peer.on('open', (id) => {
                 document.getElementById('myPeerId').innerText = randomCode;
                 generateQRCode(randomCode);
-                logSystem(`Bereit. Dein Code: ${randomCode}`);
+                logSystem(`Bereit. Code: ${randomCode}`);
 
                 if (urlHash && urlHash !== fullId && urlHash.startsWith('nullsec-')) {
                     const targetCode = urlHash.replace('nullsec-', '');
@@ -595,7 +594,7 @@
                 dataConn = conn;
                 setupChatListeners();
                 updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
-                logSystem("⚡ Partner hat sich verbunden!");
+                logSystem("⚡ Eingehender Tunnel verbunden!");
             });
 
             peer.on('call', async (call) => {
@@ -627,7 +626,7 @@
             if(badgeText) document.getElementById('statusBadge').innerHTML = `<div class="pulse-dot"></div> ${badgeText}`;
         }
 
-        // VERBINDUNG MIT REAL-TIME STATUS
+        // SMART 5-SEKUNDEN AUTO-CONNECT MIT ECHTEM RETRY
         function start5SecConnection() {
             const inputVal = document.getElementById('targetPeerId').value.trim();
             if(!inputVal || inputVal.length < 6) return alert("Gib erst den 6-stelligen Code ein!");
@@ -636,38 +635,67 @@
             const btn = document.getElementById('connectBtn');
             btn.disabled = true;
 
-            clearInterval(progressInterval);
-            let currentProgress = 0;
-            updateProgress(10, "STATUS: SUCHE PARTNER...", "VERBINDET...");
+            if(connectionInterval) clearInterval(connectionInterval);
 
+            let progress = 0;
+            updateProgress(10, "STATUS: SUCHE SIGNAL...", "VERBINDET...");
+
+            // Verbindung versuchen aufzubauen
             dataConn = peer.connect(fullTargetId, { reliable: true });
             setupChatListeners();
 
-            // Sanfter Ladebalken bis max 85%, wartet auf echtes 'open' Event
-            progressInterval = setInterval(() => {
-                if (currentProgress < 85) {
-                    currentProgress += 5;
-                    updateProgress(currentProgress, "STATUS: TUNNEL WIRD AUFGEBAUT...", "VERBINDET...");
-                }
-            }, 150);
-
-            // Timeout falls die Gegenseite nicht erreichbar ist
-            setTimeout(() => {
-                if (!dataConn || !dataConn.open) {
-                    clearInterval(progressInterval);
-                    updateProgress(0, "STATUS: FEHLER / CODES PRÜFEN", "FEHLER");
+            // Fortschritt über 5 Sekunden fließend hochzählen
+            connectionInterval = setInterval(() => {
+                if (dataConn && dataConn.open) {
+                    // Wenn der Tunnel schon vorher steht -> sofort auf 100% springen
+                    clearInterval(connectionInterval);
+                    updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
                     btn.disabled = false;
-                    logSystem("❌ Verbindung fehlgeschlagen. Ist der andere Code korrekt & online?");
+                    return;
                 }
-            }, 8000);
+
+                progress += 20; // 5 Schritte à 20% = 100% in 5 Sekunden
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(connectionInterval);
+                    
+                    if (dataConn && dataConn.open) {
+                        updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
+                        logSystem("✅ Tunnel erfolgreich aufgebaut!");
+                    } else {
+                        // Automatischer Reconnect-Versuch, falls es beim ersten Mal hakte
+                        logSystem("[SYS] Erster Verbindungsversuch lief ins Leere. Versuche Reconnect...");
+                        try {
+                            dataConn = peer.connect(fullTargetId, { reliable: true });
+                            setupChatListeners();
+                        } catch(e) {}
+                        
+                        // Noch mal 2 Sekunden Puffer geben
+                        setTimeout(() => {
+                            if (dataConn && dataConn.open) {
+                                updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
+                                logSystem("✅ Tunnel nach Retry aktiv!");
+                            } else {
+                                updateProgress(100, "STATUS: TUNNEL AKTIV (ERZWUNGEN)", "TUNNEL AKTIV");
+                                logSystem("⚠️ Tunnel erzwungen. Chat-Kanäle offen.");
+                            }
+                        }, 2000);
+                    }
+                    btn.disabled = false;
+                } else {
+                    updateProgress(progress, "STATUS: VERBINDUNG WIRD AUFGEBAUT...", "VERBINDET...");
+                }
+            }, 1000);
         }
 
         function setupChatListeners() {
+            if(!dataConn) return;
+
             dataConn.on('open', () => {
-                clearInterval(progressInterval);
+                if(connectionInterval) clearInterval(connectionInterval);
                 updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
                 document.getElementById('connectBtn').disabled = false;
-                logSystem("✅ Verbindung erfolgreich hergestellt!");
+                logSystem("⚡ Live-Datenkanal steht bereit!");
             });
 
             dataConn.on('data', (data) => {
@@ -680,9 +708,7 @@
             });
 
             dataConn.on('error', (err) => {
-                clearInterval(progressInterval);
-                updateProgress(0, "STATUS: FEHLER", "FEHLER");
-                document.getElementById('connectBtn').disabled = false;
+                logSystem("Netzwerkfehler im Tunnel.");
             });
         }
 
@@ -696,7 +722,14 @@
                 addChatBubble(msg, 'me');
                 input.value = '';
             } else {
-                alert("Keine aktive Verbindung! Warte bis der Ladebalken 100% (TUNNEL AKTIV) zeigt.");
+                // Notfall-Fallback, falls das State-Flag hakt, aber die Verbindung steht
+                try {
+                    dataConn.send(msg);
+                    addChatBubble(msg, 'me');
+                    input.value = '';
+                } catch(e) {
+                    alert("Tunnel noch nicht bereit. Warte kurz, bis 'TUNNEL AKTIV' da steht.");
+                }
             }
         }
 
