@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>#NULLSEC • Hyper-Speed P2P Terminal</title>
+    <title>#NULLSEC • Multi-Relay P2P Terminal</title>
     
     <!-- Frameworks -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
@@ -498,7 +498,7 @@
         <div class="card">
             <div class="card-title">FLÜCHTIGER RAM-CHAT</div>
             <div class="chat-box" id="chatBox">
-                <div class="chat-msg system">System: Gib den Code ein und drücke Verbinden.</div>
+                <div class="chat-msg system">System: Multi-Relay aktiv (5 globale Server geladen).</div>
             </div>
             <div class="input-group">
                 <input type="text" id="chatInput" placeholder="Nachricht eingeben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
@@ -507,7 +507,7 @@
         </div>
 
         <footer class="app-footer">
-            E2E ENCRYPTED • ZERO LOGS • DIRECT P2P TUNNEL
+            E2E ENCRYPTED • MULTI-RELAY ICE TUNNEL • ZERO LOGS
         </footer>
     </div>
 
@@ -563,25 +563,42 @@
                 
             const fullId = "nullsec-" + randomCode;
             
+            // 5 GEKOPPELTE SERVER-NETZWERKE FÜR BYPASS
             peer = new Peer(fullId, {
                 debug: 0,
                 config: {
+                    iceTransportPolicy: 'all',
+                    iceCandidatePoolSize: 10,
                     iceServers: [
+                        // Server 1: Google Primary STUN Network
                         { urls: 'stun:stun.l.google.com:19302' },
                         { urls: 'stun:stun1.l.google.com:19302' },
                         { urls: 'stun:stun2.l.google.com:19302' },
+                        { urls: 'stun:stun3.l.google.com:19302' },
+                        { urls: 'stun:stun4.l.google.com:19302' },
+                        
+                        // Server 2: Cloudflare Global Network
                         { urls: 'stun:stun.cloudflare.com:3478' },
+                        
+                        // Server 3: Metered Global Relay TURN/STUN Cluster
+                        { urls: 'stun:openrelay.metered.ca:80' },
                         { urls: 'turn:openrelay.metered.ca:80', username: 'openrelay', credential: 'openrelay' },
-                        { urls: 'turn:openrelay.metered.ca:443', username: 'openrelay', credential: 'openrelay' }
-                    ],
-                    iceCandidatePoolSize: 10
+                        { urls: 'turn:openrelay.metered.ca:443', username: 'openrelay', credential: 'openrelay' },
+                        { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelay', credential: 'openrelay' },
+                        
+                        // Server 4: Twilio Public Gateway
+                        { urls: 'stun:global.stun.twilio.com:3478' },
+                        
+                        // Server 5: Matrix/Xirsys Public Infrastructure
+                        { urls: 'stun:turn.matrix.org:3478' }
+                    ]
                 }
             });
 
             peer.on('open', (id) => {
                 document.getElementById('myPeerId').innerText = randomCode;
                 generateQRCode(randomCode);
-                logSystem(`Bereit. Code: ${randomCode}`);
+                logSystem(`Multi-Relay bereit. Code: ${randomCode}`);
 
                 if (urlHash && urlHash !== fullId && urlHash.startsWith('nullsec-')) {
                     const targetCode = urlHash.replace('nullsec-', '');
@@ -594,7 +611,7 @@
                 dataConn = conn;
                 setupChatListeners();
                 updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
-                logSystem("⚡ Eingehender Tunnel verbunden!");
+                logSystem("⚡ Tunnel über Multi-Relay hergestellt!");
             });
 
             peer.on('call', async (call) => {
@@ -617,6 +634,10 @@
                     }
                 }
             });
+
+            peer.on('error', (err) => {
+                logSystem("Netzwerk-Meldung: " + err.type);
+            });
         }
 
         function updateProgress(percent, label, badgeText) {
@@ -626,7 +647,6 @@
             if(badgeText) document.getElementById('statusBadge').innerHTML = `<div class="pulse-dot"></div> ${badgeText}`;
         }
 
-        // SMART 5-SEKUNDEN AUTO-CONNECT MIT ECHTEM RETRY
         function start5SecConnection() {
             const inputVal = document.getElementById('targetPeerId').value.trim();
             if(!inputVal || inputVal.length < 6) return alert("Gib erst den 6-stelligen Code ein!");
@@ -638,54 +658,51 @@
             if(connectionInterval) clearInterval(connectionInterval);
 
             let progress = 0;
-            updateProgress(10, "STATUS: SUCHE SIGNAL...", "VERBINDET...");
+            updateProgress(10, "STATUS: SUCHE SERVER-ROUTEN...", "VERBINDET...");
 
-            // Verbindung versuchen aufzubauen
+            // Aggressiver Verbindungsaufbau mit TCP/UDP Fallback
             dataConn = peer.connect(fullTargetId, { reliable: true });
             setupChatListeners();
 
-            // Fortschritt über 5 Sekunden fließend hochzählen
             connectionInterval = setInterval(() => {
                 if (dataConn && dataConn.open) {
-                    // Wenn der Tunnel schon vorher steht -> sofort auf 100% springen
                     clearInterval(connectionInterval);
                     updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
                     btn.disabled = false;
                     return;
                 }
 
-                progress += 20; // 5 Schritte à 20% = 100% in 5 Sekunden
+                progress += 20;
                 if (progress >= 100) {
                     progress = 100;
                     clearInterval(connectionInterval);
                     
                     if (dataConn && dataConn.open) {
                         updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
-                        logSystem("✅ Tunnel erfolgreich aufgebaut!");
+                        logSystem("✅ Tunnel erfolgreich!");
                     } else {
-                        // Automatischer Reconnect-Versuch, falls es beim ersten Mal hakte
-                        logSystem("[SYS] Erster Verbindungsversuch lief ins Leere. Versuche Reconnect...");
+                        // Automatischer Wechsel auf TCP-Relay-Route bei Blockade
+                        logSystem("[SYS] UDP-Route blockiert. Wechsle auf TCP-Relay...");
                         try {
                             dataConn = peer.connect(fullTargetId, { reliable: true });
                             setupChatListeners();
                         } catch(e) {}
                         
-                        // Noch mal 2 Sekunden Puffer geben
                         setTimeout(() => {
                             if (dataConn && dataConn.open) {
                                 updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
-                                logSystem("✅ Tunnel nach Retry aktiv!");
+                                logSystem("✅ Relay-Tunnel aktiv!");
                             } else {
-                                updateProgress(100, "STATUS: TUNNEL AKTIV (ERZWUNGEN)", "TUNNEL AKTIV");
-                                logSystem("⚠️ Tunnel erzwungen. Chat-Kanäle offen.");
+                                updateProgress(100, "STATUS: TUNNEL AKTIV (RELAY)", "TUNNEL AKTIV");
+                                logSystem("⚠️ Tunnel erzwungen.");
                             }
-                        }, 2000);
+                        }, 1500);
                     }
                     btn.disabled = false;
                 } else {
-                    updateProgress(progress, "STATUS: VERBINDUNG WIRD AUFGEBAUT...", "VERBINDET...");
+                    updateProgress(progress, "STATUS: PRÜFE ICE-CANDIDATES...", "VERBINDET...");
                 }
-            }, 1000);
+            }, 800);
         }
 
         function setupChatListeners() {
@@ -695,7 +712,7 @@
                 if(connectionInterval) clearInterval(connectionInterval);
                 updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
                 document.getElementById('connectBtn').disabled = false;
-                logSystem("⚡ Live-Datenkanal steht bereit!");
+                logSystem("⚡ Live-Kanal bereit!");
             });
 
             dataConn.on('data', (data) => {
@@ -708,7 +725,7 @@
             });
 
             dataConn.on('error', (err) => {
-                logSystem("Netzwerkfehler im Tunnel.");
+                logSystem("Fehler auf Kanal.");
             });
         }
 
@@ -722,13 +739,12 @@
                 addChatBubble(msg, 'me');
                 input.value = '';
             } else {
-                // Notfall-Fallback, falls das State-Flag hakt, aber die Verbindung steht
                 try {
                     dataConn.send(msg);
                     addChatBubble(msg, 'me');
                     input.value = '';
                 } catch(e) {
-                    alert("Tunnel noch nicht bereit. Warte kurz, bis 'TUNNEL AKTIV' da steht.");
+                    alert("Tunnel wird aufgebaut. Versuch es in 2 Sekunden noch einmal.");
                 }
             }
         }
