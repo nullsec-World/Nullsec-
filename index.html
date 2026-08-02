@@ -34,12 +34,12 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
         }
 
         .app-wrapper {
             width: 100%;
-            max-width: 520px;
+            max-width: 500px;
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
@@ -50,7 +50,7 @@
         .app-header {
             background-color: rgba(15, 23, 42, 0.8);
             border-bottom: 1px solid var(--border-color);
-            padding: 20px;
+            padding: 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -58,7 +58,7 @@
 
         .brand-title {
             font-family: var(--font-mono);
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--accent-color);
             letter-spacing: 2px;
@@ -67,149 +67,110 @@
         .status-badge {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.75rem;
+            gap: 6px;
+            font-size: 0.7rem;
             color: var(--accent-color);
             background: var(--accent-dim);
-            padding: 6px 12px;
+            padding: 4px 10px;
             border-radius: 20px;
             border: 1px solid rgba(0, 255, 204, 0.3);
             font-family: var(--font-mono);
         }
 
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--accent-color);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-color);
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.2; }
-            100% { opacity: 1; }
-        }
-
         .app-body {
-            padding: 24px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
         .code-section {
             background-color: #020617;
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 10px;
+            padding: 15px;
             text-align: center;
-        }
-
-        .section-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            font-family: var(--font-mono);
         }
 
         .code-display {
             font-family: var(--font-mono);
-            font-size: 2.8rem;
+            font-size: 2.2rem;
             font-weight: 800;
             color: var(--accent-color);
-            letter-spacing: 6px;
-            margin-bottom: 4px;
-            text-shadow: 0 0 12px rgba(0, 255, 204, 0.3);
+            letter-spacing: 4px;
         }
 
-        .vpn-box {
-            background-color: #020617;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
-            font-family: var(--font-mono);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .vpn-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .vpn-title {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-        }
-
-        .vpn-ip {
-            font-size: 1.1rem;
-            color: var(--accent-color);
-            font-weight: bold;
-        }
-
-        .vpn-node {
-            font-size: 0.8rem;
-            color: #9ca3af;
-        }
-
-        .action-button {
-            width: 100%;
-            background-color: var(--accent-color);
-            color: #000000;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            font-family: var(--font-mono);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .action-button:hover {
-            opacity: 0.9;
-            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
-        }
-
-        .terminal-box {
-            background-color: #020617;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: #9ca3af;
-            height: 100px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .log-entry {
+        .connect-box {
             display: flex;
             gap: 8px;
         }
 
-        .log-time {
+        input[type="text"] {
+            flex: 1;
+            background: #020617;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 8px;
             color: var(--accent-color);
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .call-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-call {
+            flex: 1;
+            background: #10b981;
+            color: #fff;
+        }
+
+        .btn-hangup {
+            flex: 1;
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .chat-box {
+            background-color: #020617;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            height: 150px;
+            padding: 10px;
+            overflow-y: auto;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .chat-msg {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 10px;
+            border-radius: 6px;
         }
 
         .app-footer {
             border-top: 1px solid var(--border-color);
-            padding: 16px 24px;
-            background-color: rgba(15, 23, 42, 0.4);
+            padding: 12px;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
             font-family: var(--font-mono);
         }
@@ -220,90 +181,100 @@
     <div class="app-wrapper">
         <header class="app-header">
             <div class="brand-title">NULLSEC</div>
-            <div class="status-badge">
-                <div class="pulse-dot"></div>
-                P2P ACTIVE
-            </div>
+            <div class="status-badge">IN-MEMORY ONLY</div>
         </header>
 
         <main class="app-body">
-            <section class="code-section">
-                <div class="section-label">Session Access Code</div>
-                <div class="code-display" id="codeSlot">-----</div>
-            </section>
-
-            <!-- VPN MODUL -->
-            <div class="vpn-box">
-                <div class="vpn-info">
-                    <div class="vpn-title">DYNAMIC VPN ROUTE (AUTO 5S)</div>
-                    <div class="vpn-ip" id="vpnIp">---.---.---.---</div>
-                </div>
-                <div class="vpn-node" id="vpnNode">NODE: INIT</div>
+            <!-- EIGENER CODE -->
+            <div class="code-section">
+                <div style="font-size: 0.7rem; color: var(--text-muted);">DEIN CODE (ZUM TEILEN)</div>
+                <div class="code-display" id="myCode">-----</div>
+                <button style="width: 100%; margin-top: 8px;" onclick="generateCode()">Neuen Code Erzeugen</button>
             </div>
 
-            <button class="action-button" onclick="generateNewCode()">
-                Code Generieren
-            </button>
+            <!-- CODE VOM FREUND EINGEBEN -->
+            <div class="connect-box">
+                <input type="text" id="friendCode" placeholder="Code vom Freund eingeben..." maxlength="5">
+                <button onclick="connectToFriend()">Verbinden</button>
+            </div>
 
-            <div class="terminal-box" id="terminalLog">
-                <div class="log-entry">
-                    <span class="log-time">[SYSTEM]</span>
-                    <span>NULLSEC protocol initialized.</span>
-                </div>
+            <!-- ANRUF KNÖPFE -->
+            <div class="call-controls">
+                <button class="btn-call" onclick="startCall()">Anrufen 📞</button>
+                <button class="btn-hangup" onclick="endCall()">Auflegen ❌</button>
+            </div>
+
+            <!-- CHAT FENSTER -->
+            <div class="chat-box" id="chatBox">
+                <div class="chat-msg" style="color: var(--text-muted);">System: Bereit für Anruf & Chat. Keine Speicherung.</div>
+            </div>
+
+            <!-- NACHRICHT SCHREIBEN -->
+            <div class="connect-box">
+                <input type="text" id="chatInput" placeholder="Nachricht schreiben...">
+                <button onclick="sendMessage()">Senden</button>
             </div>
         </main>
 
         <footer class="app-footer">
-            #NULLSEC NETWORK • NO LOCAL DATA STORED
+            #NULLSEC P2P NETWORK • ZERO LOGS
         </footer>
     </div>
 
     <script>
-        // Speicher blockieren
+        // Speicher komplett sperren
         try {
             window.localStorage.clear();
             window.sessionStorage.clear();
             Storage.prototype.setItem = function() {};
         } catch(e) {}
 
-        const nodes = ["Frankfurt", "Zurich", "Amsterdam", "Stockholm", "Reykjavik", "Tokyo", "Singapore"];
-
-        function getFormattedTime() {
-            const now = new Date();
-            return `[${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}]`;
+        function generateCode() {
+            const code = Math.floor(10000 + Math.random() * 90000);
+            document.getElementById('myCode').innerText = code;
         }
 
-        function addTerminalLog(message) {
-            const logContainer = document.getElementById('terminalLog');
-            const logEntry = document.createElement('div');
-            logEntry.className = 'log-entry';
-            logEntry.innerHTML = `<span class="log-time">${getFormattedTime()}</span><span>${message}</span>`;
-            logContainer.appendChild(logEntry);
-            logContainer.scrollTop = logContainer.scrollHeight;
+        function connectToFriend() {
+            const code = document.getElementById('friendCode').value;
+            if(code.length < 5) {
+                alert("Bitte gültigen 5-stelligen Code eingeben!");
+                return;
+            }
+            addChatMsg(`Verbindung wird zu Code ${code} aufgebaut...`);
         }
 
-        function generateNewCode() {
-            const numericCode = Math.floor(10000 + Math.random() * 90000);
-            document.getElementById('codeSlot').innerText = numericCode;
-            addTerminalLog(`New Session Code: ${numericCode}`);
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            if(!input.value) return;
+            addChatMsg(`Du: ${input.value}`);
+            input.value = '';
         }
 
-        // Automatischer VPN-Wechsel alle 5 Sekunden
-        function rotateVpn() {
-            const randomIp = `${Math.floor(Math.random() * 150 + 40)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
-            const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
-
-            document.getElementById('vpnIp').innerText = randomIp;
-            document.getElementById('vpnNode').innerText = `NODE: ${randomNode.toUpperCase()}`;
-            addTerminalLog(`VPN Route Changed -> IP: ${randomIp} (${randomNode})`);
+        function addChatMsg(text) {
+            const box = document.getElementById('chatBox');
+            const msg = document.createElement('div');
+            msg.className = 'chat-msg';
+            msg.innerText = text;
+            box.appendChild(msg);
+            box.scrollTop = box.scrollHeight;
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            generateNewCode();
-            rotateVpn();
-            // Startet den 5-Sekunden-Timer für den VPN-Wechsel
-            setInterval(rotateVpn, 5000);
-        });
+        function startCall() {
+            // Fordert Mikrofonausdauer an für Sprache
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    addChatMsg("Mikrofon aktiv. Anruf läuft...");
+                })
+                .catch(err => {
+                    addChatMsg("Mikrofon-Zugriff verweigert.");
+                });
+        }
+
+        function endCall() {
+            addChatMsg("Anruf beendet.");
+        }
+
+        window.onload = generateCode;
     </script>
 </body>
 </html>
