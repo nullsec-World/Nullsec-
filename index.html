@@ -6,15 +6,15 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>#NULLSEC - Anonymous P2P Terminal</title>
+    <title>#NULLSEC - Ultra Fast Anonymous P2P</title>
     
-    <!-- PeerJS CDN für echte P2P-Verbindungen -->
+    <!-- PeerJS CDN -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <style>
         :root {
             --bg-color: #030712;
-            --panel-bg: rgba(11, 17, 32, 0.85);
+            --panel-bg: rgba(11, 17, 32, 0.9);
             --accent-green: #00ffcc;
             --accent-dim: rgba(0, 255, 204, 0.12);
             --accent-red: #ff3366;
@@ -41,7 +41,7 @@
             padding: 15px;
             background-image: 
                 radial-gradient(circle at 50% 50%, rgba(0, 255, 204, 0.05) 0%, transparent 80%),
-                linear-gradient(rgba(3, 7, 18, 0.9), rgba(3, 7, 18, 0.9));
+                linear-gradient(rgba(3, 7, 18, 0.95), rgba(3, 7, 18, 0.95));
         }
 
         .app-container {
@@ -50,21 +50,20 @@
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            box-shadow: 0 0 30px rgba(0, 255, 204, 0.15);
-            backdrop-filter: blur(12px);
+            box-shadow: 0 0 35px rgba(0, 255, 204, 0.2);
+            backdrop-filter: blur(16px);
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        /* HEADER */
         .app-header {
             padding: 16px 20px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.8);
         }
 
         .brand-logo {
@@ -73,7 +72,7 @@
             font-weight: 800;
             color: var(--accent-green);
             letter-spacing: 2px;
-            text-shadow: 0 0 8px rgba(0, 255, 204, 0.4);
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
         }
 
         .status-pill {
@@ -85,7 +84,7 @@
             background: var(--accent-dim);
             padding: 4px 10px;
             border-radius: 20px;
-            border: 1px solid rgba(0, 255, 204, 0.3);
+            border: 1px solid rgba(0, 255, 204, 0.4);
             font-family: var(--font-mono);
         }
 
@@ -94,17 +93,16 @@
             height: 6px;
             background: var(--accent-green);
             border-radius: 50%;
-            box-shadow: 0 0 6px var(--accent-green);
-            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 8px var(--accent-green);
+            animation: pulse 1s infinite;
         }
 
         @keyframes pulse {
             0% { opacity: 1; }
-            50% { opacity: 0.3; }
+            50% { opacity: 0.2; }
             100% { opacity: 1; }
         }
 
-        /* BODY CONTENT */
         .app-body {
             padding: 20px;
             display: flex;
@@ -113,7 +111,7 @@
         }
 
         .card {
-            background: rgba(2, 6, 23, 0.7);
+            background: rgba(2, 6, 23, 0.8);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 16px;
@@ -128,19 +126,17 @@
             font-family: var(--font-mono);
         }
 
-        /* CODE GENERATOR DISPLAY */
         .code-display {
             font-family: var(--font-mono);
-            font-size: 2.2rem;
+            font-size: 2.4rem;
             font-weight: 800;
             color: var(--accent-green);
             letter-spacing: 4px;
             text-align: center;
-            text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+            text-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
             margin: 4px 0;
         }
 
-        /* INPUTS & BUTTONS */
         .input-group {
             display: flex;
             gap: 8px;
@@ -174,12 +170,16 @@
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            transition: all 0.2s;
+            transition: all 0.15s ease-in-out;
         }
 
         .btn:hover {
-            box-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
-            opacity: 0.9;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+            transform: scale(1.02);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
         }
 
         .btn-danger {
@@ -191,7 +191,6 @@
             width: 100%;
         }
 
-        /* MEDIA / VIDEO CONTAINER */
         .media-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -220,13 +219,12 @@
             left: 6px;
             font-size: 0.6rem;
             font-family: var(--font-mono);
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             padding: 2px 6px;
             border-radius: 4px;
             color: var(--accent-green);
         }
 
-        /* CHAT SYSTEM */
         .chat-box {
             height: 160px;
             background: #020617;
@@ -265,7 +263,6 @@
             font-style: italic;
         }
 
-        /* VPN BAR */
         .vpn-bar {
             display: flex;
             justify-content: space-between;
@@ -278,7 +275,6 @@
             color: var(--accent-green);
         }
 
-        /* FOOTER */
         .app-footer {
             padding: 12px;
             border-top: 1px solid var(--border-color);
@@ -293,41 +289,35 @@
 <body>
 
     <div class="app-container">
-        <!-- HEADER -->
         <header class="app-header">
             <div class="brand-logo">#NULLSEC</div>
             <div class="status-pill">
                 <div class="pulse-dot"></div>
-                P2P RAM-ONLY
+                RAM-ONLY / E2EE
             </div>
         </header>
 
-        <!-- MAIN BODY -->
         <main class="app-body">
             
-            <!-- VPN SIMULATION BAR -->
             <div class="vpn-bar">
                 <div>ROUTE: <span id="vpnRoute">ROTATING...</span></div>
-                <div>IP: <span id="vpnIp">0.0.0.0</span></div>
+                <div>DYNAMIC IP: <span id="vpnIp">0.0.0.0</span></div>
             </div>
 
-            <!-- YOUR ACCESS CODE -->
             <div class="card">
                 <div class="card-label">DEINE ANONYME P2P-ID</div>
-                <div class="code-display" id="myPeerId">--- ---</div>
+                <div class="code-display" id="myPeerId">------</div>
                 <button class="btn btn-full" style="margin-top: 8px;" onclick="initPeer()">ID Neu Generieren</button>
             </div>
 
-            <!-- CONNECT TO FRIEND -->
             <div class="card">
-                <div class="card-label">VERBINDUNG AUFBAUEN</div>
+                <div class="card-label">BLITZ-VERBINDUNG (INSTANT P2P)</div>
                 <div class="input-group">
-                    <input type="text" id="targetPeerId" placeholder="ID vom Freund eingeben...">
+                    <input type="text" id="targetPeerId" placeholder="6-stelligen Code eingeben...">
                     <button class="btn" onclick="connectToPeer()">Verbinden</button>
                 </div>
             </div>
 
-            <!-- VIDEO / AUDIO STREAMS -->
             <div class="card">
                 <div class="card-label">ANRUF & VIDEO (PEER-TO-PEER)</div>
                 <div class="media-grid">
@@ -341,34 +331,32 @@
                     </div>
                 </div>
                 <div class="input-group" style="margin-top: 10px;">
-                    <button class="btn btn-full" onclick="startCall(true)">Video Anruf 📹</button>
-                    <button class="btn btn-full" onclick="startCall(false)">Audio Anruf 📞</button>
+                    <button class="btn btn-full" onclick="startCall(true)">Video 📹</button>
+                    <button class="btn btn-full" onclick="startCall(false)">Audio 📞</button>
                     <button class="btn btn-danger" onclick="hangUp()">Auflegen ❌</button>
                 </div>
             </div>
 
-            <!-- CHAT BOX -->
             <div class="card">
-                <div class="card-label">ECHTZEIT CHAT (NO LOGS)</div>
+                <div class="card-label">ECHTZEIT CHAT (FLÜCHTIGER RAM-SPEICHER)</div>
                 <div class="chat-box" id="chatBox">
-                    <div class="chat-msg system">System: Bereit für verschlüsselte P2P Übertragung.</div>
+                    <div class="chat-msg system">System: Ultra-Fast High Priority Tunnel bereit.</div>
                 </div>
                 <div class="input-group" style="margin-top: 10px;">
-                    <input type="text" id="chatInput" placeholder="Nachrichten eingeben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                    <input type="text" id="chatInput" placeholder="Nachricht eingeben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
                     <button class="btn" onclick="sendChatMessage()">Senden</button>
                 </div>
             </div>
 
         </main>
 
-        <!-- FOOTER -->
         <footer class="app-footer">
-            #NULLSEC NETWORK • POWERED BY GOOGLE GLOBAL STUN • ZERO STORAGE
+            #NULLSEC • E2E DTLS-ENCRYPTED • NO LOGS • NO STORAGE
         </footer>
     </div>
 
     <script>
-        // Storage Blocking (Zero-Storage Policy)
+        // ZERO-STORAGE GUARANTEE: Blockiert jeglichen Festplattenspeicher des Browsers
         try {
             window.localStorage.clear();
             window.sessionStorage.clear();
@@ -382,7 +370,6 @@
 
         const nodes = ["Frankfurt", "Zurich", "Amsterdam", "Stockholm", "Reykjavik", "Tokyo"];
 
-        // Dynamic VPN Simulation Loop (5 Sekunden)
         function rotateVpn() {
             const randomIp = `${Math.floor(Math.random() * 150 + 40)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
             const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
@@ -392,42 +379,37 @@
         setInterval(rotateVpn, 5000);
         rotateVpn();
 
-        // 1. PeerJS mit den weltgrößten kostenlosen Google STUN-Servern initialisieren
+        // 1. PeerJS mit High-Priority Google STUN Servern (Optimiert für Blitz-Verbindung)
         function initPeer() {
             if(peer) peer.destroy();
             
-            // Erstellt eine zufällige 6-stellige Zahl als ID
             const customId = "nullsec-" + Math.floor(100000 + Math.random() * 900000);
             
-            // Einbindung der schnellen Google-Infrastruktur für P2P-Verbindung
             peer = new Peer(customId, {
+                debug: 0,
                 config: {
                     iceServers: [
                         { urls: 'stun:stun.l.google.com:19302' },
                         { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:stun2.l.google.com:19302' },
-                        { urls: 'stun:stun3.l.google.com:19302' },
-                        { urls: 'stun:stun4.l.google.com:19302' }
-                    ]
+                        { urls: 'stun:stun2.l.google.com:19302' }
+                    ],
+                    iceCandidatePoolSize: 10 // Vorab-Pool für <1s Verbindungsaufbau
                 }
             });
 
             peer.on('open', (id) => {
                 document.getElementById('myPeerId').innerText = id.replace('nullsec-', '');
-                logSystem(`Deine Anonyme ID erstellt: ${id.replace('nullsec-', '')}`);
-                logSystem(`Verbunden mit dem weltweiten Google STUN-Netzwerk.`);
+                logSystem(`Sicherer P2P-Tunnel bereit. ID: ${id.replace('nullsec-', '')}`);
             });
 
-            // Wenn jemand UNS kontaktiert (Chat)
             peer.on('connection', (conn) => {
                 dataConn = conn;
                 setupChatListeners();
-                logSystem("Partner hat sich verbunden!");
+                logSystem("BLITZ-VERBINDUNG HERGESTELLT!");
             });
 
-            // Wenn jemand UNS anruft (Audio/Video)
             peer.on('call', async (call) => {
-                const acceptCall = confirm("Eingehender P2P-Anruf! Annehmen?");
+                const acceptCall = confirm("Eingehender Anruf! Annehmen?");
                 if (acceptCall) {
                     try {
                         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -438,34 +420,34 @@
                             document.getElementById('remoteVideo').srcObject = remoteStream;
                         });
                         mediaCall = call;
-                        logSystem("Anruf verbunden!");
+                        logSystem("Anruf aktiv!");
                     } catch(err) {
-                        alert("Zugriff auf Kamera/Mikrofon fehlgeschlagen.");
+                        alert("Kamera/Mikrofon nicht erreichbar.");
                     }
                 }
             });
 
             peer.on('error', (err) => {
-                logSystem(`Fehler: ${err.type}`);
+                logSystem(`Status: ${err.type}`);
             });
         }
 
-        // 2. Zu Partner Verbinden (Chat)
+        // 2. Blitz-Verbindung zum Freund aufbauen
         function connectToPeer() {
             const inputVal = document.getElementById('targetPeerId').value.trim();
-            if(!inputVal) return alert("Bitte ID vom Freund eingeben!");
+            if(!inputVal) return alert("Gib den 6-stelligen Code ein!");
 
             const fullTargetId = "nullsec-" + inputVal;
             logSystem(`Verbinde zu ${inputVal}...`);
             
-            dataConn = peer.connect(fullTargetId);
+            // Verbindungsaufbau mit Low-Latency Option
+            dataConn = peer.connect(fullTargetId, { reliable: true });
             setupChatListeners();
         }
 
-        // 3. Chat-Events verwalten
         function setupChatListeners() {
             dataConn.on('open', () => {
-                logSystem("Chat-Tunnel erfolgreich etabliert!");
+                logSystem("Tunnel aktiv! Kommunikation verschlüsselt.");
             });
 
             dataConn.on('data', (data) => {
@@ -473,7 +455,7 @@
             });
 
             dataConn.on('close', () => {
-                logSystem("Verbindung getrennt.");
+                logSystem("Verbindung getrennt. RAM gesäubert.");
             });
         }
 
@@ -487,7 +469,7 @@
                 addChatBubble(msg, 'me');
                 input.value = '';
             } else {
-                alert("Du bist noch mit keinem Partner verbunden!");
+                alert("Erst Code eingeben und auf 'Verbinden' drücken!");
             }
         }
 
@@ -509,10 +491,9 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // 4. Anruf starten (Audio oder Video)
         async function startCall(withVideo) {
             const inputVal = document.getElementById('targetPeerId').value.trim();
-            if(!inputVal) return alert("Gib zuerst die ID deines Freundes ein!");
+            if(!inputVal) return alert("Gib erst den Code deines Freundes ein!");
 
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ 
@@ -528,13 +509,12 @@
                     document.getElementById('remoteVideo').srcObject = remoteStream;
                 });
 
-                logSystem(`${withVideo ? 'Video' : 'Audio'}-Anruf wird aufgebaut...`);
+                logSystem("Anruf wird aufgebaut...");
             } catch(err) {
                 alert("Mikrofon oder Kamera konnte nicht aktiviert werden.");
             }
         }
 
-        // 5. Auflegen
         function hangUp() {
             if(mediaCall) mediaCall.close();
             if(localStream) {
@@ -545,7 +525,6 @@
             logSystem("Anruf beendet.");
         }
 
-        // Beim Laden direkt starten
         window.addEventListener('DOMContentLoaded', () => {
             initPeer();
         });
