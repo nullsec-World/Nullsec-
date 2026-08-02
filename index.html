@@ -13,7 +13,6 @@
             --card-bg: #0b1120;
             --accent-color: #00ffcc;
             --accent-dim: rgba(0, 255, 204, 0.15);
-            --danger-color: #ff4757;
             --text-main: #f3f4f6;
             --text-muted: #6b7280;
             --border-color: #1f2937;
@@ -84,12 +83,12 @@
             background-color: var(--accent-color);
             border-radius: 50%;
             box-shadow: 0 0 8px var(--accent-color);
-            animation: pulse 2s infinite;
+            animation: pulse 1s infinite;
         }
 
         @keyframes pulse {
             0% { opacity: 1; }
-            50% { opacity: 0.3; }
+            50% { opacity: 0.2; }
             100% { opacity: 1; }
         }
 
@@ -104,7 +103,7 @@
             background-color: #020617;
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 24px;
+            padding: 20px;
             text-align: center;
         }
 
@@ -113,7 +112,7 @@
             text-transform: uppercase;
             letter-spacing: 1.5px;
             color: var(--text-muted);
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             font-family: var(--font-mono);
         }
 
@@ -123,13 +122,41 @@
             font-weight: 800;
             color: var(--accent-color);
             letter-spacing: 6px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             text-shadow: 0 0 12px rgba(0, 255, 204, 0.3);
         }
 
-        .code-subtext {
-            font-size: 0.75rem;
+        .vpn-box {
+            background-color: #020617;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            font-family: var(--font-mono);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .vpn-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .vpn-title {
+            font-size: 0.7rem;
             color: var(--text-muted);
+        }
+
+        .vpn-ip {
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .vpn-node {
+            font-size: 0.8rem;
+            color: #9ca3af;
         }
 
         .action-button {
@@ -151,37 +178,6 @@
         .action-button:hover {
             opacity: 0.9;
             box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
-            transform: translateY(-1px);
-        }
-
-        .action-button:active {
-            transform: translateY(0);
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .info-box {
-            background-color: #020617;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            font-family: var(--font-mono);
-        }
-
-        .info-title {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .info-value {
-            font-size: 0.85rem;
-            color: var(--text-main);
-            font-weight: 600;
         }
 
         .terminal-box {
@@ -192,7 +188,7 @@
             font-family: var(--font-mono);
             font-size: 0.75rem;
             color: #9ca3af;
-            height: 90px;
+            height: 100px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -234,32 +230,25 @@
             <section class="code-section">
                 <div class="section-label">Session Access Code</div>
                 <div class="code-display" id="codeSlot">-----</div>
-                <div class="code-subtext">Ephemeral ZK-Token • Auto-Expires on Close</div>
             </section>
 
-            <button class="action-button" onclick="generateNewCode()">
-                Generate New Code
-            </button>
-
-            <div class="info-grid">
-                <div class="info-box">
-                    <div class="info-title">STORAGE MODE</div>
-                    <div class="info-value">0% (In-Memory Only)</div>
+            <!-- VPN MODUL -->
+            <div class="vpn-box">
+                <div class="vpn-info">
+                    <div class="vpn-title">DYNAMIC VPN ROUTE (AUTO 5S)</div>
+                    <div class="vpn-ip" id="vpnIp">---.---.---.---</div>
                 </div>
-                <div class="info-box">
-                    <div class="info-title">ENCRYPTION</div>
-                    <div class="info-value">End-to-End P2P</div>
-                </div>
+                <div class="vpn-node" id="vpnNode">NODE: INIT</div>
             </div>
+
+            <button class="action-button" onclick="generateNewCode()">
+                Code Generieren
+            </button>
 
             <div class="terminal-box" id="terminalLog">
                 <div class="log-entry">
                     <span class="log-time">[SYSTEM]</span>
                     <span>NULLSEC protocol initialized.</span>
-                </div>
-                <div class="log-entry">
-                    <span class="log-time">[SEC]</span>
-                    <span>LocalStorage & SessionStorage purged.</span>
                 </div>
             </div>
         </main>
@@ -270,58 +259,50 @@
     </div>
 
     <script>
-        // Block all local persistent storage
-        (function enforceZeroStorage() {
-            try {
-                window.localStorage.clear();
-                window.sessionStorage.clear();
-                
-                Storage.prototype.setItem = function() {
-                    console.warn("Storage blocked by NULLSEC Security Policy.");
-                };
-                Storage.prototype.getItem = function() { return null; };
-            } catch (err) {
-                console.error("Zero-Storage initialization failed:", err);
-            }
-        })();
+        // Speicher blockieren
+        try {
+            window.localStorage.clear();
+            window.sessionStorage.clear();
+            Storage.prototype.setItem = function() {};
+        } catch(e) {}
 
-        // Helper to format timestamps for log entries
+        const nodes = ["Frankfurt", "Zurich", "Amsterdam", "Stockholm", "Reykjavik", "Tokyo", "Singapore"];
+
         function getFormattedTime() {
             const now = new Date();
-            const hrs = String(now.getHours()).padStart(2, '0');
-            const mins = String(now.getMinutes()).padStart(2, '0');
-            const secs = String(now.getSeconds()).padStart(2, '0');
-            return `[${hrs}:${mins}:${secs}]`;
+            return `[${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}]`;
         }
 
-        // Add visual entries to terminal window
         function addTerminalLog(message) {
             const logContainer = document.getElementById('terminalLog');
             const logEntry = document.createElement('div');
             logEntry.className = 'log-entry';
-            
-            logEntry.innerHTML = `
-                <span class="log-time">${getFormattedTime()}</span>
-                <span>${message}</span>
-            `;
-            
+            logEntry.innerHTML = `<span class="log-time">${getFormattedTime()}</span><span>${message}</span>`;
             logContainer.appendChild(logEntry);
             logContainer.scrollTop = logContainer.scrollHeight;
         }
 
-        // Generate purely numeric codes (e.g. 77388)
         function generateNewCode() {
-            // Generates a 5-digit number from 10000 to 99999
             const numericCode = Math.floor(10000 + Math.random() * 90000);
-            
             document.getElementById('codeSlot').innerText = numericCode;
-            addTerminalLog(`New key generated: ${numericCode}`);
+            addTerminalLog(`New Session Code: ${numericCode}`);
         }
 
-        // Initial setup on window load
+        // Automatischer VPN-Wechsel alle 5 Sekunden
+        function rotateVpn() {
+            const randomIp = `${Math.floor(Math.random() * 150 + 40)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+            const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+
+            document.getElementById('vpnIp').innerText = randomIp;
+            document.getElementById('vpnNode').innerText = `NODE: ${randomNode.toUpperCase()}`;
+            addTerminalLog(`VPN Route Changed -> IP: ${randomIp} (${randomNode})`);
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             generateNewCode();
-            addTerminalLog("Ready. No trace retained.");
+            rotateVpn();
+            // Startet den 5-Sekunden-Timer für den VPN-Wechsel
+            setInterval(rotateVpn, 5000);
         });
     </script>
 </body>
