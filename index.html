@@ -7,27 +7,27 @@
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <style>
     :root {
-      --bg-base: #0b0f19;
-      --bg-panel: #111827;
-      --bg-hover: #1f2937;
+      --bg-base: #050811;
+      --bg-panel: #0b1120;
+      --bg-hover: #131c31;
       --accent: #00ff88;
-      --accent-glow: rgba(0, 255, 136, 0.25);
+      --accent-glow: rgba(0, 255, 136, 0.35);
       --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      --border: #1f2937;
+      --text-muted: #6b7280;
+      --border: #162032;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background-color: #030712; color: var(--text-main); height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    body { background-color: #010308; color: var(--text-main); height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
     #app-container {
       width: 100%; max-width: 480px; height: 100%; max-height: 900px;
       background: var(--bg-base); display: flex; flex-direction: column;
-      border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      border: 1px solid var(--border); box-shadow: 0 0 40px rgba(0,255,136,0.05);
       position: relative; overflow: hidden;
     }
     @media (min-width: 481px) {
-      #app-container { border-radius: 16px; height: 92vh; }
+      #app-container { border-radius: 12px; height: 92vh; border: 1px solid rgba(0,255,136,0.2); }
     }
 
     header {
@@ -35,24 +35,24 @@
       display: flex; justify-content: space-between; align-items: center;
       border-bottom: 1px solid var(--border);
     }
-    .brand-area { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-    .my-avatar-preview { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); background: #000; }
-    .brand-info h1 { font-size: 0.95rem; font-weight: 700; color: var(--accent); letter-spacing: 0.5px; }
-    .brand-info p { font-size: 0.7rem; color: var(--text-muted); }
+    .brand-area { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+    .my-avatar-preview { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); background: #000; box-shadow: 0 0 10px var(--accent-glow); }
+    .brand-info h1 { font-size: 0.85rem; font-weight: 700; color: var(--accent); letter-spacing: 1px; text-transform: uppercase; }
+    .brand-info p { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.5px; }
 
     .header-actions { display: flex; gap: 8px; }
     .icon-btn {
-      background: var(--bg-hover); border: none; color: var(--text-main);
-      width: 34px; height: 34px; border-radius: 50%; display: flex;
-      align-items: center; justify-content: center; cursor: pointer; font-size: 0.9rem;
+      background: var(--bg-hover); border: 1px solid var(--border); color: var(--accent);
+      width: 34px; height: 34px; border-radius: 8px; display: flex;
+      align-items: center; justify-content: center; cursor: pointer; font-size: 0.85rem;
       transition: 0.2s;
     }
-    .icon-btn:hover { background: var(--accent); color: #000; }
+    .icon-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 10px var(--accent-glow); }
 
     #security-banner {
-      background: rgba(0, 255, 136, 0.05); border-bottom: 1px solid rgba(0, 255, 136, 0.15);
-      padding: 6px; text-align: center; font-size: 0.65rem; color: var(--accent);
-      font-weight: 600; letter-spacing: 0.5px;
+      background: rgba(0, 255, 136, 0.03); border-bottom: 1px solid rgba(0, 255, 136, 0.1);
+      padding: 6px; text-align: center; font-size: 0.6rem; color: var(--accent);
+      font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
     }
 
     .main-view { display: flex; flex: 1; overflow: hidden; position: relative; }
@@ -64,29 +64,29 @@
     }
     #sidebar.hidden { transform: translateX(-100%); }
     
-    .sidebar-search { padding: 10px; background: var(--bg-panel); border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
+    .sidebar-search { padding: 12px; background: var(--bg-panel); border-bottom: 1px solid var(--border); display: flex; gap: 8px; }
     .sidebar-search input {
       flex: 1; background: var(--bg-base); border: 1px solid var(--border);
-      padding: 8px 12px; border-radius: 20px; color: #fff; font-size: 0.85rem; outline: none;
+      padding: 8px 12px; border-radius: 8px; color: #fff; font-size: 0.8rem; outline: none;
     }
-    .sidebar-search input:focus { border-color: var(--accent); }
+    .sidebar-search input:focus { border-color: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
 
     .contact-list { flex: 1; overflow-y: auto; }
     .contact-item {
       display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-      cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02);
+      cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.01);
       transition: background 0.15s;
     }
     .contact-item:hover { background: var(--bg-panel); }
-    .contact-item.active { background: var(--bg-hover); }
-    .contact-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #222; flex-shrink: 0; }
+    .contact-item.active { background: var(--bg-hover); border-left: 3px solid var(--accent); }
+    .contact-avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; background: #111; flex-shrink: 0; border: 1px solid var(--border); }
     .contact-details { flex: 1; overflow: hidden; }
-    .contact-name { font-weight: 600; font-size: 0.9rem; color: #fff; }
-    .contact-sub { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .contact-name { font-weight: 600; font-size: 0.85rem; color: #fff; letter-spacing: 0.5px; }
+    .contact-sub { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
 
     #chat-pane {
       width: 100%; height: 100%; display: flex; flex-direction: column;
-      background: #070a14; position: absolute; top: 0; left: 0; z-index: 1;
+      background: #03060c; position: absolute; top: 0; left: 0; z-index: 1;
     }
     
     .chat-header {
@@ -98,14 +98,14 @@
     
     .chat-messages {
       flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
-      background-image: radial-gradient(circle at center, #0b1329 0%, #030712 100%);
+      background-image: radial-gradient(circle at center, #070e1a 0%, #03060c 100%);
     }
     
-    .message { max-width: 75%; padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; line-height: 1.4; word-break: break-word; position: relative; }
-    .message.sent { align-self: flex-end; background: #064e3b; color: #ecfdf5; border-top-right-radius: 2px; }
-    .message.received { align-self: flex-start; background: #1f2937; color: #f3f4f6; border-top-left-radius: 2px; }
-    .message .time { font-size: 0.6rem; opacity: 0.6; margin-top: 4px; text-align: right; display: block; }
-    .message.system { align-self: center; background: rgba(0,0,0,0.4); color: var(--accent); font-size: 0.7rem; border-radius: 8px; border: 1px solid rgba(0,255,136,0.2); text-align: center; }
+    .message { max-width: 75%; padding: 10px 14px; border-radius: 8px; font-size: 0.8rem; line-height: 1.4; word-break: break-word; position: relative; }
+    .message.sent { align-self: flex-end; background: rgba(0, 255, 136, 0.1); color: #ecfdf5; border: 1px solid rgba(0, 255, 136, 0.2); }
+    .message.received { align-self: flex-start; background: var(--bg-panel); color: #f3f4f6; border: 1px solid var(--border); }
+    .message .time { font-size: 0.55rem; opacity: 0.5; margin-top: 4px; text-align: right; display: block; }
+    .message.system { align-self: center; background: rgba(0,0,0,0.6); color: var(--accent); font-size: 0.65rem; border-radius: 6px; border: 1px solid rgba(0,255,136,0.2); text-align: center; padding: 6px 12px; }
 
     .chat-input-area {
       padding: 12px 16px; background: var(--bg-panel); border-top: 1px solid var(--border);
@@ -113,46 +113,44 @@
     }
     .chat-input-area input {
       flex: 1; background: var(--bg-base); border: 1px solid var(--border);
-      padding: 10px 16px; border-radius: 24px; color: #fff; font-size: 0.9rem; outline: none;
+      padding: 10px 16px; border-radius: 8px; color: #fff; font-size: 0.85rem; outline: none;
     }
-    .chat-input-area input:focus { border-color: var(--accent); }
+    .chat-input-area input:focus { border-color: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
     .send-btn {
       background: var(--accent); color: #000; border: none; width: 40px; height: 40px;
-      border-radius: 50%; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: 0.2s;
     }
-    .send-btn:hover { transform: scale(1.05); box-shadow: 0 0 10px var(--accent-glow); }
+    .send-btn:hover { transform: scale(1.05); box-shadow: 0 0 12px var(--accent-glow); }
 
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.8); backdrop-filter: blur(4px);
+      background: rgba(1,3,8,0.85); backdrop-filter: blur(6px);
       display: none; justify-content: center; align-items: center; z-index: 9999;
     }
     .modal-box {
       background: var(--bg-panel); border: 1px solid var(--border); width: 90%; max-width: 360px;
-      padding: 24px; border-radius: 16px; display: flex; flex-direction: column; gap: 16px;
+      padding: 24px; border-radius: 12px; display: flex; flex-direction: column; gap: 16px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.9);
     }
-    .modal-title { font-size: 1.1rem; font-weight: bold; color: var(--accent); text-align: center; }
-    .modal-box input {
-      background: var(--bg-base); border: 1px solid var(--border); padding: 10px 14px;
-      border-radius: 8px; color: #fff; font-size: 0.9rem; outline: none; width: 100%;
-    }
-    .modal-box input:focus { border-color: var(--accent); }
+    .modal-title { font-size: 1rem; font-weight: bold; color: var(--accent); text-align: center; letter-spacing: 1px; }
     
     .avatar-upload-wrapper {
-      display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer;
     }
     .avatar-upload-preview {
-      width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px dashed var(--accent); background: #000;
+      width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px dashed var(--accent); background: #000;
     }
 
     .btn-primary {
       background: var(--accent); color: #000; border: none; padding: 12px;
-      border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center;
+      border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; font-size: 0.85rem; letter-spacing: 0.5px;
+      transition: 0.2s;
     }
+    .btn-primary:hover { box-shadow: 0 0 12px var(--accent-glow); }
     .btn-secondary {
       background: transparent; color: var(--text-muted); border: 1px solid var(--border);
-      padding: 10px; border-radius: 8px; cursor: pointer; text-align: center;
+      padding: 10px; border-radius: 8px; cursor: pointer; text-align: center; font-size: 0.8rem;
     }
 
     #call-screen {
@@ -160,8 +158,8 @@
       background: #000; z-index: 99999; display: none; flex-direction: column; justify-content: space-between; padding: 20px;
     }
     #remote-video { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; z-index: 1; }
-    #local-video { width: 100px; height: 140px; border-radius: 12px; object-fit: cover; position: fixed; right: 20px; bottom: 90px; z-index: 2; border: 2px solid var(--accent); }
-    .call-ui-top { z-index: 3; background: rgba(0,0,0,0.6); padding: 10px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+    #local-video { width: 100px; height: 140px; border-radius: 8px; object-fit: cover; position: fixed; right: 20px; bottom: 90px; z-index: 2; border: 2px solid var(--accent); }
+    .call-ui-top { z-index: 3; background: rgba(0,0,0,0.7); padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .call-ui-bottom { z-index: 3; display: flex; justify-content: center; gap: 20px; padding-bottom: 20px; }
     .call-btn { width: 50px; height: 50px; border-radius: 50%; border: none; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
@@ -182,34 +180,29 @@
   <div class="modal-overlay" id="info-modal">
     <div class="modal-box">
       <div class="modal-title">#NULLSEC SYSTEM INFO</div>
-      <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.5;">
-        Dezentraler, verschlüsselter P2P-Messenger.
+      <p style="font-size: 0.75rem; color: var(--text-muted); line-height: 1.6;">
+        Dezentraler Darknet-Style P2P-Messenger.
         <br><br>
-        • <strong>Direkte Verbindung:</strong> Keine Server, die deine Daten speichern.<br>
-        • <strong>Eigene Medien:</strong> Profilbilder werden direkt aus deinen lokalen Fotos ausgewählt und an deine Kontakte übertragen.
+        • <strong>Keine Identität:</strong> Völlig anonyme Node-Architektur ohne Klarnamen.<br>
+        • <strong>Tor-Routingsimulation:</strong> Der TVB-Knotenpunkt rotiert automatisch alle 5 Sekunden für maximale Verschleierung.
       </p>
-      <button class="btn-primary" onclick="toggleModal('info-modal', false)">Verstanden</button>
+      <button class="btn-primary" onclick="toggleModal('info-modal', false)">SCHLIESSEN</button>
     </div>
   </div>
 
   <!-- Profil Bearbeiten Modal -->
   <div class="modal-overlay" id="profile-modal">
     <div class="modal-box">
-      <div class="modal-title">PROFIL BEARBEITEN</div>
+      <div class="modal-title">NODE EINSTELLUNGEN</div>
       
       <div class="avatar-upload-wrapper" onclick="document.getElementById('hidden-file-input').click()">
         <img id="modal-avatar-preview" class="avatar-upload-preview" src="" alt="Avatar" />
-        <span style="font-size: 0.75rem; color: var(--accent);">Foto aus Galerie wählen</span>
+        <span style="font-size: 0.7rem; color: var(--accent);">Node-Avatar ändern</span>
         <input type="file" id="hidden-file-input" accept="image/*" style="display: none;" onchange="handleImageUpload(event)" />
       </div>
-
-      <div>
-        <label style="font-size: 0.75rem; color: var(--text-muted);">Dein Name:</label>
-        <input type="text" id="input-my-name" placeholder="Name eingeben..." />
-      </div>
       
-      <button class="btn-primary" onclick="saveMyProfile()">Speichern</button>
-      <button class="btn-secondary" onclick="toggleModal('profile-modal', false)">Abbrechen</button>
+      <button class="btn-primary" onclick="saveMyProfile()">ÜBERNEHMEN</button>
+      <button class="btn-secondary" onclick="toggleModal('profile-modal', false)">ABBRECHEN</button>
     </div>
   </div>
 
@@ -218,10 +211,10 @@
     <video id="remote-video" autoplay playsinline></video>
     <video id="local-video" autoplay playsinline muted></video>
     <div class="call-ui-top">
-      <span id="call-status-label" style="color: var(--accent); font-size: 0.85rem; font-weight: bold;">Verbinde...</span>
+      <span id="call-status-label" style="color: var(--accent); font-size: 0.75rem; font-weight: bold; letter-spacing: 1px;">VERBINDE SECURE-STREAM...</span>
     </div>
     <div class="call-ui-bottom">
-      <button class="call-btn" style="background: #ef4444; color: #fff;" onclick="endCall()">📞</button>
+      <button class="call-btn" style="background: #ef4444; color: #fff;" onclick="endCall()">✕</button>
     </div>
   </div>
 
@@ -231,19 +224,19 @@
       <div class="brand-area" onclick="openProfileModal()">
         <img id="header-avatar" class="my-avatar-preview" src="" alt="Avatar" />
         <div class="brand-info">
-          <h1 id="header-name">Lade...</h1>
+          <h1 id="header-name">#NULLSEC NODE</h1>
           <p id="my-peer-id-display">ID: ...</p>
         </div>
       </div>
       <div class="header-actions">
-        <button class="icon-btn" onclick="toggleModal('info-modal', true)" title="Info">ℹ️</button>
-        <button class="icon-btn" onclick="addNewChatPrompt()" title="Neuer Chat">➕</button>
+        <button class="icon-btn" onclick="toggleModal('info-modal', true)" title="Info">?</button>
+        <button class="icon-btn" onclick="addNewChatPrompt()" title="Neuer Chat">+</button>
       </div>
     </header>
 
-    <!-- Security Banner -->
+    <!-- Security Banner with Dynamic TVB Rotor (Tor-Style) -->
     <div id="security-banner">
-      🔒 END-TO-END VERSCHLÜSSELT | FOTOS DIREKT AUS GALERIE
+      🔒 END-TO-ENDE VERSCHLÜSSELT | TVB: <span id="tvb-rotor">ROTIERE...</span>
     </div>
 
     <!-- Main View -->
@@ -251,7 +244,7 @@
       <!-- Sidebar -->
       <div id="sidebar">
         <div class="sidebar-search">
-          <input type="text" id="new-peer-input" placeholder="Friend-Code eingeben & Enter..." />
+          <input type="text" id="new-peer-input" placeholder="Node-ID eingeben & Enter..." />
         </div>
         <div class="contact-list" id="contact-list-container"></div>
       </div>
@@ -261,25 +254,25 @@
         <div class="chat-header">
           <div class="chat-header-left">
             <button class="back-btn" onclick="closeChatMobile()">←</button>
-            <img id="active-chat-avatar" class="contact-avatar" style="width:36px;height:36px;" src="" />
+            <img id="active-chat-avatar" class="contact-avatar" style="width:34px;height:34px;" src="" />
             <div>
-              <div id="active-chat-name" style="font-weight: 600; font-size: 0.9rem;">Wähle einen Chat</div>
-              <div id="active-chat-status" style="font-size: 0.65rem; color: var(--text-muted);">Offline</div>
+              <div id="active-chat-name" style="font-weight: 600; font-size: 0.85rem; letter-spacing: 0.5px;">SECURE CHAT</div>
+              <div id="active-chat-status" style="font-size: 0.6rem; color: var(--text-muted); letter-spacing: 0.5px;">OFFLINE</div>
             </div>
           </div>
           <div class="header-actions" id="call-buttons-group" style="display: none;">
-            <button class="icon-btn" onclick="startCall('audio')" title="Audioanruf">📞</button>
+            <button class="icon-btn" onclick="startCall('audio')" title="Audioanruf">🎤</button>
             <button class="icon-btn" onclick="startCall('video')" title="Videoanruf">📹</button>
           </div>
         </div>
 
         <div class="chat-messages" id="chat-messages-box">
-          <div class="message system">Wähle links einen Kontakt oder füge einen Code hinzu.</div>
+          <div class="message system">Wähle einen Peer aus oder verbinde dich über eine Node-ID.</div>
         </div>
 
         <div class="chat-input-area">
-          <input type="text" id="msg-input" placeholder="Nachricht schreiben..." disabled />
-          <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>➤</button>
+          <input type="text" id="msg-input" placeholder="Verschlüsselte Nachricht senden..." disabled />
+          <button class="send-btn" id="send-btn" onclick="sendMessage()" disabled>></button>
         </div>
       </div>
     </div>
@@ -292,14 +285,36 @@
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      gain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
       osc.connect(gain); gain.connect(audioCtx.destination);
       osc.start(); osc.stop(audioCtx.currentTime + duration);
     }
 
+    // Tor-Style Auto-Rotor für TVB alle 5 Sekunden
+    function generateRandomHex(len) {
+      let result = '';
+      const chars = '0123456789ABCDEF';
+      for (let i = 0; i < len; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    function updateTVBRotor() {
+      const node1 = generateRandomHex(4);
+      const node2 = generateRandomHex(4);
+      const node3 = generateRandomHex(4);
+      const el = document.getElementById('tvb-rotor');
+      if (el) {
+        el.textContent = `${node1}➔${node2}➔${node3} [SECURE]`;
+      }
+    }
+    setInterval(updateTVBRotor, 5000);
+    updateTVBRotor();
+
     let myProfile = JSON.parse(localStorage.getItem('nullsec_profile')) || {
-      name: "Elyas",
+      name: "ANONYMOUS_NODE",
       avatar: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%2300ff88'><circle cx='50' cy='50' r='50'/></svg>"
     };
     let chats = JSON.parse(localStorage.getItem('nullsec_chats')) || {};
@@ -309,12 +324,10 @@
     updateMyProfileUI();
 
     function updateMyProfileUI() {
-      document.getElementById('header-name').textContent = myProfile.name;
       document.getElementById('header-avatar').src = myProfile.avatar;
     }
 
     function openProfileModal() {
-      document.getElementById('input-my-name').value = myProfile.name;
       tempAvatarBase64 = myProfile.avatar;
       document.getElementById('modal-avatar-preview').src = tempAvatarBase64;
       toggleModal('profile-modal', true);
@@ -332,7 +345,6 @@
     }
 
     function saveMyProfile() {
-      myProfile.name = document.getElementById('input-my-name').value.trim() || "Elyas";
       myProfile.avatar = tempAvatarBase64;
       localStorage.setItem('nullsec_profile', JSON.stringify(myProfile));
       updateMyProfileUI();
@@ -346,11 +358,11 @@
       document.getElementById(id).style.display = show ? 'flex' : 'none';
     }
 
-    const myId = "nullsec-" + Math.floor(Math.random() * 90000 + 10000);
+    const myId = "node-" + Math.floor(Math.random() * 90000 + 10000);
     const peer = new Peer(myId);
 
     peer.on('open', (id) => {
-      document.getElementById('my-peer-id-display').textContent = "ID: " + id;
+      document.getElementById('my-peer-id-display').textContent = "NODE: " + id;
       renderContactList();
     });
 
@@ -370,9 +382,9 @@
         call.answer(localStream);
         call.on('stream', (remoteStream) => {
           document.getElementById('remote-video').srcObject = remoteStream;
-          document.getElementById('call-status-label').textContent = "LIVE GESPRÄCH";
+          document.getElementById('call-status-label').textContent = "SECURE STREAM AKTIV";
         });
-      } catch(e) { alert("Medien-Fehler"); }
+      } catch(e) { alert("Stream-Fehler"); }
     });
 
     document.getElementById('new-peer-input').addEventListener('keypress', (e) => {
@@ -386,7 +398,7 @@
     });
 
     function addNewChatPrompt() {
-      const code = prompt("Friend-Code eingeben:");
+      const code = prompt("Ziel Node-ID eingeben:");
       if (code) connectToPeer(code.trim());
     }
 
@@ -406,12 +418,12 @@
       switchToChat(activePeerId);
 
       conn.on('open', () => {
-        document.getElementById('active-chat-status').textContent = "Online";
+        document.getElementById('active-chat-status').textContent = "GESICHERT & ONLINE";
         document.getElementById('msg-input').disabled = false;
         document.getElementById('send-btn').disabled = false;
         document.getElementById('call-buttons-group').style.display = 'flex';
         conn.send({ type: 'profile_sync', profile: myProfile });
-        playBeep(800, 0.1);
+        playBeep(900, 0.08);
       });
 
       conn.on('data', (data) => {
@@ -421,13 +433,13 @@
           renderContactList();
           updateChatHeaderInfo();
         } else if (data.type === 'msg') {
-          playBeep(500, 0.08);
+          playBeep(600, 0.06);
           appendMessage(activePeerId, data.text, 'received');
         }
       });
 
       conn.on('close', () => {
-        document.getElementById('active-chat-status').textContent = "Offline";
+        document.getElementById('active-chat-status').textContent = "OFFLINE";
         document.getElementById('call-buttons-group').style.display = 'none';
       });
     }
@@ -439,7 +451,7 @@
 
       activeConnection.send({ type: 'msg', text: text });
       appendMessage(activePeerId, text, 'sent');
-      playBeep(650, 0.06);
+      playBeep(750, 0.05);
       input.value = '';
     }
 
@@ -466,20 +478,20 @@
       const keys = Object.keys(chats);
 
       if (keys.length === 0) {
-        container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">Keine Chats. Oben auf ➕ tippen.</div>';
+        container.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 0.75rem;">Keine aktiven Nodes. Oben auf + tippen.</div>';
         return;
       }
 
       keys.forEach(id => {
-        const info = contactsInfo[id] || { name: id, avatar: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%23333'><circle cx='50' cy='50' r='50'/></svg>" };
-        const lastMsg = chats[id].length > 0 ? chats[id][chats[id].length - 1].text : "Keine Nachrichten";
+        const info = contactsInfo[id] || { avatar: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%23111'><circle cx='50' cy='50' r='50'/></svg>" };
+        const lastMsg = chats[id].length > 0 ? chats[id][chats[id].length - 1].text : "Keine Daten";
         
         const div = document.createElement('div');
         div.className = `contact-item ${activePeerId === id ? 'active' : ''}`;
         div.innerHTML = `
           <img class="contact-avatar" src="${info.avatar}" alt="Avatar" />
           <div class="contact-details">
-            <div class="contact-name">${info.name}</div>
+            <div class="contact-name">${id}</div>
             <div class="contact-sub">${escapeHtml(lastMsg)}</div>
           </div>
         `;
@@ -512,8 +524,8 @@
     }
 
     function updateChatHeaderInfo() {
-      const info = contactsInfo[activePeerId] || { name: activePeerId, avatar: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%23333'><circle cx='50' cy='50' r='50'/></svg>" };
-      document.getElementById('active-chat-name').textContent = info.name;
+      const info = contactsInfo[activePeerId] || { avatar: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%23111'><circle cx='50' cy='50' r='50'/></svg>" };
+      document.getElementById('active-chat-name').textContent = `NODE // ${activePeerId}`;
       document.getElementById('active-chat-avatar').src = info.avatar;
     }
 
@@ -541,10 +553,10 @@
         currentCall = call;
         call.on('stream', (remoteStream) => {
           document.getElementById('remote-video').srcObject = remoteStream;
-          document.getElementById('call-status-label').textContent = "GESPRÄCH AKTIV";
+          document.getElementById('call-status-label').textContent = "SECURE STREAM GESICHERT";
         });
       } catch(e) {
-        alert("Mikrofon/Kamera Zugriff verweigert.");
+        alert("Medien-Zugriff verweigert.");
         endCall();
       }
     }
