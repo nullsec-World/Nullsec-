@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>#NULLSEC • Instant Direct Chat</title>
+    <title>#NULLSEC • Cyberpunk Ultra Messenger</title>
     <style>
         :root {
             --bg-dark: #0b141a;
             --panel-bg: #111b21;
             --header-bg: #202c33;
             --neon-green: #00a884;
+            --neon-red: #ea0038;
             --text-main: #e9edef;
             --text-muted: #8696a0;
             --msg-me: #005c4b;
@@ -49,11 +50,13 @@
         @media (min-width: 601px) {
             .container {
                 height: 94vh;
-                border-radius: 16px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+                border-radius: 20px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+                border: 1px solid rgba(0, 168, 132, 0.2);
             }
         }
 
+        /* HEADER & CALL BUTTONS */
         .header {
             background: var(--header-bg);
             padding: 12px 16px;
@@ -61,6 +64,11 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .brand-box {
+            display: flex;
+            flex-direction: column;
         }
 
         .brand {
@@ -71,26 +79,54 @@
         }
 
         .status {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--neon-green);
-            background: rgba(0, 168, 132, 0.1);
-            padding: 4px 8px;
-            border-radius: 10px;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            box-shadow: 0 0 6px var(--neon-green);
+        }
+
+        .call-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: #2a3942;
+            color: var(--text-main);
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .icon-btn:active {
+            background: var(--neon-green);
+            color: #111b21;
+        }
+
+        /* CODE BAR */
         .setup-box {
             background: var(--panel-bg);
-            padding: 12px 16px;
+            padding: 10px 16px;
             display: flex;
-            flex-direction: column;
             gap: 8px;
             border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .row {
-            display: flex;
-            gap: 8px;
         }
 
         input {
@@ -98,9 +134,9 @@
             background: var(--input-bg);
             border: none;
             padding: 10px 14px;
-            border-radius: 8px;
+            border-radius: 10px;
             color: var(--text-main);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             outline: none;
             text-align: center;
         }
@@ -109,11 +145,12 @@
             box-shadow: 0 0 0 1px var(--neon-green);
         }
 
+        /* CHAT BEREICH */
         .chat-box {
             flex: 1;
             background-color: var(--bg-dark);
-            background-image: radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px);
-            background-size: 24px 24px;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
             padding: 16px;
             overflow-y: auto;
             display: flex;
@@ -123,34 +160,37 @@
 
         .msg {
             max-width: 80%;
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 10px 14px;
+            border-radius: 12px;
             font-size: 0.9rem;
             line-height: 1.4;
             word-break: break-word;
             position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.4);
         }
 
         .msg.me {
             background: var(--msg-me);
             align-self: flex-end;
-            border-top-right-radius: 0;
+            border-top-right-radius: 2px;
         }
 
         .msg.peer {
             background: var(--msg-peer);
             align-self: flex-start;
-            border-top-left-radius: 0;
+            border-top-left-radius: 2px;
         }
 
         .msg.sys {
-            background: rgba(255,255,255,0.05);
-            color: var(--text-muted);
+            background: rgba(0, 168, 132, 0.1);
+            color: var(--neon-green);
+            border: 1px solid rgba(0, 168, 132, 0.2);
             align-self: center;
             font-size: 0.75rem;
             text-align: center;
-            border-radius: 6px;
-            max-width: 95%;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-weight: bold;
         }
 
         .time {
@@ -161,6 +201,7 @@
             margin-top: 4px;
         }
 
+        /* INPUT BAR */
         .input-bar {
             background: var(--header-bg);
             padding: 10px 16px;
@@ -189,78 +230,160 @@
             cursor: pointer;
             flex-shrink: 0;
         }
+
+        /* ANRUF OVERLAY (VIDEO & AUDIO) */
+        .call-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0b141a;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 20px;
+            z-index: 999;
+        }
+
+        .video-grid {
+            width: 100%;
+            height: 70%;
+            position: relative;
+            background: #111b21;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .my-video {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            width: 100px;
+            height: 140px;
+            border-radius: 12px;
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .call-controls {
+            display: flex;
+            gap: 20px;
+        }
+
+        .end-call-btn {
+            background: var(--neon-red);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(234, 0, 56, 0.4);
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <!-- HEADER MIT ANRUF-BUTTONS -->
     <div class="header">
-        <div class="brand">#NULLSEC INSTANT</div>
-        <div class="status" id="statusBadge">BEREIT</div>
-    </div>
-
-    <!-- CODE EINGABE (SOFORT AKTIV) -->
-    <div class="setup-box">
-        <div class="row">
-            <input type="text" id="myCode" readonly title="Dein eigener Code">
-            <input type="text" id="targetCode" placeholder="Code vom Partner eingeben..." oninput="checkAndConnect()">
+        <div class="brand-box">
+            <div class="brand">#NULLSEC</div>
+            <div class="status" id="statusBadge">
+                <div class="pulse-dot"></div>
+                BEREIT
+            </div>
+        </div>
+        <div class="call-actions">
+            <button class="icon-btn" onclick="startCall(false)" title="Sprachanruf">📞</button>
+            <button class="icon-btn" onclick="startCall(true)" title="Videoanruf">📹</button>
         </div>
     </div>
 
-    <div class="chat-box" id="chatBox">
-        <div class="msg sys">Dein eigener Code wird generiert. Tippe den Code deines Partners ein und schreibe direkt drauf los!</div>
+    <!-- CODE BAR -->
+    <div class="setup-box">
+        <input type="text" id="myCode" readonly title="Dein eigener Code">
+        <input type="text" id="targetCode" placeholder="Partner-Code eingeben..." oninput="checkAndConnect()">
     </div>
 
+    <!-- CHAT BEREICH -->
+    <div class="chat-box" id="chatBox">
+        <div class="msg sys" id="connNotice">Gib den 6-stelligen Partner-Code oben ein.</div>
+    </div>
+
+    <!-- INPUT BAR -->
     <div class="input-bar">
         <input type="text" id="msgInput" placeholder="Nachricht schreiben..." onkeypress="if(event.key==='Enter') sendMsg()">
         <button class="send-btn" onclick="sendMsg()">➤</button>
     </div>
+
+    <!-- ANRUF OVERLAY SCREEN -->
+    <div class="call-overlay" id="callOverlay">
+        <div style="text-align: center;">
+            <h2 id="callTypeTitle" style="color: var(--neon-green); margin-bottom: 5px;">Anruf läuft...</h2>
+            <p id="callTimer" style="color: var(--text-muted); font-size: 0.9rem;">00:00</p>
+        </div>
+
+        <div class="video-grid">
+            <video id="peerVideo" autoplay playsinline></video>
+            <video id="myVideo" class="my-video" autoplay playsinline muted></video>
+        </div>
+
+        <div class="call-controls">
+            <button class="end-call-btn" onclick="endCall()">⏹</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    // Generiere einen zufälligen 6-stelligen Code für dich selbst
+    // Generiere deinen persönlichen 6-stelligen Code
     let myId = Math.floor(100000 + Math.random() * 900000).toString();
-    document.getElementById('myCode').value = "MEIN CODE: " + myId;
+    document.getElementById('myCode').value = "DEIN CODE: " + myId;
 
     let ws = null;
     let activeChannel = "";
+    let localStream = null;
 
-    // Öffentlicher Hochgeschwindigkeits-Messaging-Kanal
     function connectToChannel(channelId) {
         if (!channelId || channelId.length !== 6) return;
-        
         if (activeChannel === channelId && ws && ws.readyState === WebSocket.OPEN) return;
 
         if (ws) ws.close();
         activeChannel = channelId;
 
-        // Wir nutzen einen gemeinsamen Raum, der sich aus beiden Codes oder dem Zielcode ergibt, 
-        // damit beide Handys exakt denselben Tunnel nutzen.
-        // Sortierung garantiert, dass egal wer wen eintippt, derselbe Raum geöffnet wird.
+        // Eindeutige Tunnel-Verbindung für beide Partner
         const roomName = [myId, channelId].sort().join('_');
-
         ws = new WebSocket(`wss://sockets.space/v1/nullsec_${roomName}`);
 
         ws.onopen = () => {
-            document.getElementById('statusBadge').innerText = "LIVE & VERBUNDEN";
-            logSys(`Direkt verbunden mit Kanal #${channelId}! Du kannst schreiben.`);
+            document.getElementById('statusBadge').innerHTML = `<div class="pulse-dot"></div> VERBUNDEN`;
+            logSys(`⚡ VERBUNDEN MIT #${channelId}!`);
         };
 
         ws.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
-                if (data.sender !== myId && data.text) {
-                    addMsg(data.text, 'peer');
+                if (data.sender !== myId) {
+                    if (data.text) addMsg(data.text, 'peer');
+                    if (data.type === 'call_request') handleIncomingCall(data.video);
+                    if (data.type === 'call_end') closeCallUI();
                 }
             } catch(e) {}
         };
-
-        ws.onerror = () => {
-            logSys("⚠️ Verbindung wird gehalten...");
-        };
     }
 
-    // Sobald der Partner-Code eingetippt wird (automatisch ab 6 Ziffern), baut sich der Kanal ohne Klick auf
     function checkAndConnect() {
         const val = document.getElementById('targetCode').value.trim();
         if (val.length === 6) {
@@ -275,24 +398,15 @@
 
         const target = document.getElementById('targetCode').value.trim();
         if (target.length !== 6) {
-            alert("Bitte zuerst den 6-stelligen Code des Partners oben eingeben!");
+            alert("Bitte zuerst oben den 6-stelligen Partner-Code eingeben!");
             return;
         }
 
-        // Sicherstellen, dass die Verbindung steht
-        if (!ws || ws.readyState !== WebSocket.OPEN) {
-            connectToChannel(target);
-        }
+        connectToChannel(target);
 
-        const payload = JSON.stringify({
-            sender: myId,
-            text: text
-        });
-
-        // Sofortiges Senden
         setTimeout(() => {
             if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(payload);
+                ws.send(JSON.stringify({ sender: myId, text: text }));
             }
         }, 50);
 
@@ -300,14 +414,66 @@
         input.value = '';
     }
 
+    /* ANRUF-LOGIK */
+    async function startCall(isVideo) {
+        const target = document.getElementById('targetCode').value.trim();
+        if (target.length !== 6) return alert("Bitte Partner-Code eingeben!");
+
+        connectToChannel(target);
+
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({
+                video: isVideo,
+                audio: true
+            });
+            document.getElementById('myVideo').srcObject = localStream;
+            document.getElementById('callOverlay').style.display = 'flex';
+            document.getElementById('callTypeTitle').innerText = isVideo ? "📹 Videoanruf..." : "📞 Sprachanruf...";
+
+            setTimeout(() => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ sender: myId, type: 'call_request', video: isVideo }));
+                }
+            }, 100);
+
+        } catch(err) {
+            alert("Kamera/Mikrofon-Zugriff verweigert oder nicht verfügbar!");
+        }
+    }
+
+    function handleIncomingCall(isVideo) {
+        logSys(`Anruf kommt rein (${isVideo ? 'Video' : 'Audio'})...`);
+        const accept = confirm(`Eingehender ${isVideo ? 'Videoanruf' : 'Sprachanruf'}! Annehmen?`);
+        if (accept) {
+            navigator.mediaDevices.getUserMedia({ video: isVideo, audio: true }).then(stream => {
+                localStream = stream;
+                document.getElementById('myVideo').srcObject = stream;
+                document.getElementById('callOverlay').style.display = 'flex';
+            });
+        }
+    }
+
+    function endCall() {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ sender: myId, type: 'call_end' }));
+        }
+        closeCallUI();
+    }
+
+    function closeCallUI() {
+        if (localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+        }
+        document.getElementById('callOverlay').style.display = 'none';
+        logSys("Anruf beendet.");
+    }
+
     function addMsg(text, type) {
         const box = document.getElementById('chatBox');
         const div = document.createElement('div');
         div.className = `msg ${type}`;
-        
         const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         div.innerHTML = `${text}<span class="time">${time}</span>`;
-        
         box.appendChild(div);
         box.scrollTop = box.scrollHeight;
     }
@@ -320,9 +486,6 @@
         box.appendChild(div);
         box.scrollTop = box.scrollHeight;
     }
-
-    // Direkt beim Start eigenen Code ins System laden
-    logSys(`Dein Code ist #${myId}. Gib den Code deines Partners ein, um sofort zu starten.`);
 </script>
 
 </body>
