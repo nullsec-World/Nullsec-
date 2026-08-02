@@ -3,812 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- ZERO STORAGE POLICY -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <title>#NULLSEC • Hyper-Speed P2P Terminal</title>
-    
-    <!-- Frameworks -->
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
+    <title>#NULLSEC • Instant Direct Chat</title>
     <style>
         :root {
-            --bg-dark: #020617;
-            --panel-bg: rgba(15, 23, 42, 0.85);
-            --panel-border: rgba(0, 255, 204, 0.25);
-            --neon-green: #00ffcc;
-            --neon-glow: rgba(0, 255, 204, 0.4);
-            --neon-dim: rgba(0, 255, 204, 0.08);
-            --neon-red: #ff0055;
-            --neon-blue: #00bfff;
-            --text-main: #f8fafc;
-            --text-muted: #64748b;
-            --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            --bg-dark: #0b141a;
+            --panel-bg: #111b21;
+            --header-bg: #202c33;
+            --neon-green: #00a884;
+            --text-main: #e9edef;
+            --text-muted: #8696a0;
+            --msg-me: #005c4b;
+            --msg-peer: #202c33;
+            --input-bg: #2a3942;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            user-select: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            min-height: 100vh;
+            height: 100vh;
+            height: 100dvh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 16px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-image: 
-                linear-gradient(rgba(0, 255, 204, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 204, 0.03) 1px, transparent 1px),
-                radial-gradient(circle at 50% 0%, var(--neon-glow) 0%, transparent 85%);
-            background-size: 25px 25px, 25px 25px, 100% 100%;
-            background-attachment: fixed;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
-        .app-container {
+        .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 600px;
+            height: 100%;
             background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 28px;
-            box-shadow: 0 0 60px rgba(0, 255, 204, 0.15), inset 0 0 20px rgba(0, 255, 204, 0.05);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            overflow: hidden;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            padding: 24px;
             position: relative;
         }
 
-        .app-header {
+        @media (min-width: 601px) {
+            .container {
+                height: 94vh;
+                border-radius: 16px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            }
+        }
+
+        .header {
+            background: var(--header-bg);
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        .brand-title {
-            font-family: var(--font-mono);
-            font-size: 1.4rem;
+        .brand {
             font-weight: 900;
             color: var(--neon-green);
-            letter-spacing: 3px;
-            text-shadow: 0 0 15px var(--neon-glow);
-        }
-
-        .status-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.65rem;
-            color: var(--neon-green);
-            background: var(--neon-dim);
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid rgba(0, 255, 204, 0.3);
-            font-family: var(--font-mono);
-            font-weight: 700;
-        }
-
-        .pulse-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--neon-green);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--neon-green);
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.2; transform: scale(0.7); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        .progress-container {
-            width: 100%;
-            background: rgba(2, 6, 23, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 14px;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .progress-text {
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            color: var(--neon-green);
-            display: flex;
-            justify-content: space-between;
-            font-weight: 700;
-        }
-
-        .progress-bar-bg {
-            width: 100%;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid rgba(0, 255, 204, 0.2);
-        }
-
-        .progress-bar-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
-            box-shadow: 0 0 12px var(--neon-green);
-            transition: width 0.2s ease-out;
-        }
-
-        .card {
-            background: rgba(2, 6, 23, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            transition: border-color 0.3s ease;
-        }
-
-        .card:hover {
-            border-color: rgba(0, 255, 204, 0.3);
-        }
-
-        .card-title {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            font-weight: 700;
-        }
-
-        .code-display-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .code-display {
-            font-family: var(--font-mono);
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--neon-green);
-            letter-spacing: 8px;
-            text-align: center;
-            text-shadow: 0 0 20px var(--neon-glow);
-            padding: 12px;
-            width: 100%;
-            background: rgba(0, 255, 204, 0.03);
-            border-radius: 14px;
-            border: 1px dashed rgba(0, 255, 204, 0.3);
-        }
-
-        #qrcode {
-            background: #fff;
-            padding: 12px;
-            border-radius: 14px;
-            display: none;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            background: rgba(2, 6, 23, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 14px 18px;
-            border-radius: 14px;
-            color: var(--neon-green);
-            font-family: var(--font-mono);
-            font-size: 1rem;
-            outline: none;
-            transition: all 0.2s ease;
-        }
-
-        input[type="text"]:focus {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 15px var(--neon-glow);
-        }
-
-        .btn {
-            background: var(--neon-green);
-            color: #020617;
-            border: none;
-            padding: 14px 20px;
-            border-radius: 14px;
-            font-weight: 900;
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            cursor: pointer;
-            text-transform: uppercase;
+            font-size: 1.1rem;
             letter-spacing: 1px;
-            transition: all 0.2s ease;
+        }
+
+        .status {
+            font-size: 0.7rem;
+            color: var(--neon-green);
+            background: rgba(0, 168, 132, 0.1);
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .setup-box {
+            background: var(--panel-bg);
+            padding: 12px 16px;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .row {
+            display: flex;
             gap: 8px;
         }
 
-        .btn:hover {
-            box-shadow: 0 0 25px var(--neon-glow);
-            transform: translateY(-2px);
-        }
-
-        .btn:active {
-            transform: translateY(1px);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
+        input {
+            flex: 1;
+            background: var(--input-bg);
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
             color: var(--text-main);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            outline: none;
+            text-align: center;
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: none;
-        }
-
-        .btn-full {
-            width: 100%;
+        input:focus {
+            box-shadow: 0 0 0 1px var(--neon-green);
         }
 
         .chat-box {
-            height: 180px;
-            background: rgba(2, 6, 23, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            padding: 12px;
+            flex: 1;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 24px 24px;
+            padding: 16px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
         }
 
-        .chat-msg {
+        .msg {
+            max-width: 80%;
             padding: 8px 12px;
-            border-radius: 10px;
-            word-break: break-word;
+            border-radius: 8px;
+            font-size: 0.9rem;
             line-height: 1.4;
+            word-break: break-word;
+            position: relative;
         }
 
-        .chat-msg.me {
-            background: var(--neon-dim);
-            color: var(--neon-green);
+        .msg.me {
+            background: var(--msg-me);
             align-self: flex-end;
-            border: 1px solid rgba(0, 255, 204, 0.25);
+            border-top-right-radius: 0;
         }
 
-        .chat-msg.peer {
-            background: rgba(0, 191, 255, 0.12);
-            color: var(--neon-blue);
+        .msg.peer {
+            background: var(--msg-peer);
             align-self: flex-start;
-            border: 1px solid rgba(0, 191, 255, 0.25);
+            border-top-left-radius: 0;
         }
 
-        .chat-msg.system {
+        .msg.sys {
+            background: rgba(255,255,255,0.05);
             color: var(--text-muted);
-            font-style: italic;
-            font-size: 0.72rem;
+            align-self: center;
+            font-size: 0.75rem;
             text-align: center;
-            background: transparent;
+            border-radius: 6px;
+            max-width: 95%;
         }
 
-        .call-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #000;
-            z-index: 9999;
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .call-overlay.active {
-            display: flex;
-        }
-
-        .remote-video-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        #fullscreenRemoteVideo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .local-video-container {
-            position: absolute;
-            top: 30px;
-            right: 20px;
-            width: 110px;
-            height: 160px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 2px solid var(--neon-green);
-            border-radius: 16px;
-            overflow: hidden;
-            z-index: 2;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
-        }
-
-        #fullscreenLocalVideo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .call-header-info {
-            position: relative;
-            z-index: 3;
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            background: rgba(2, 6, 23, 0.6);
-            padding: 10px 20px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .call-partner-name {
-            font-family: var(--font-mono);
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--neon-green);
-        }
-
-        .call-timer {
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
+        .time {
+            font-size: 0.6rem;
             color: var(--text-muted);
+            float: right;
+            margin-left: 8px;
+            margin-top: 4px;
         }
 
-        .call-controls {
-            position: relative;
-            z-index: 3;
-            margin-bottom: 40px;
+        .input-bar {
+            background: var(--header-bg);
+            padding: 10px 16px;
             display: flex;
-            gap: 20px;
-            background: rgba(2, 6, 23, 0.75);
-            padding: 16px 28px;
-            border-radius: 40px;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            gap: 10px;
+            align-items: center;
         }
 
-        .call-btn {
-            width: 56px;
-            height: 56px;
+        .input-bar input {
+            border-radius: 20px;
+            padding: 12px 18px;
+            text-align: left;
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
+            background: var(--neon-green);
+            color: #111b21;
             border: none;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .call-btn-mute { background: rgba(255, 255, 255, 0.15); color: #fff; }
-        .call-btn-video { background: rgba(255, 255, 255, 0.15); color: #fff; }
-        .call-btn-hangup { background: var(--neon-red); color: #fff; box-shadow: 0 0 20px rgba(255, 0, 85, 0.6); }
-
-        .call-btn:active { transform: scale(0.9); }
-
-        .app-footer {
-            text-align: center;
-            font-size: 0.65rem;
-            font-family: var(--font-mono);
-            color: var(--text-muted);
-            letter-spacing: 1.5px;
-            padding-top: 4px;
+            flex-shrink: 0;
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <header class="app-header">
-            <div class="brand-title">#NULLSEC</div>
-            <div class="status-badge" id="statusBadge">
-                <div class="pulse-dot"></div>
-                STANDBY
-            </div>
-        </header>
-
-        <!-- LADEBALKEN -->
-        <div class="progress-container">
-            <div class="progress-text">
-                <span id="progressLabel">STATUS: BEREIT</span>
-                <span id="progressPercent">0%</span>
-            </div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="progressBarFill"></div>
-            </div>
-        </div>
-
-        <!-- CODE GENERATOR -->
-        <div class="card">
-            <div class="card-title">DEINE ANONYME VERBINDUNGS-ID</div>
-            <div class="code-display-box">
-                <div class="code-display" id="myPeerId">------</div>
-                <div id="qrcode"></div>
-            </div>
-            <div style="display: flex; gap: 8px;">
-                <button class="btn btn-secondary btn-full" onclick="copyFastLink()">⚡ LINK KOPIEREN</button>
-                <button class="btn btn-secondary" onclick="toggleQR()">📱 QR</button>
-            </div>
-        </div>
-
-        <!-- CONNECT BOX -->
-        <div class="card">
-            <div class="card-title">BLITZ-VERBINDUNG</div>
-            <div class="input-group">
-                <input type="text" id="targetPeerId" placeholder="6-Stelligen Code eingeben..." maxlength="6">
-                <button class="btn" id="connectBtn" onclick="start5SecConnection()">VERBINDEN</button>
-            </div>
-        </div>
-
-        <!-- REALTIME CALL -->
-        <div class="card">
-            <div class="card-title">REALTIME ANRUF</div>
-            <div class="input-group">
-                <button class="btn btn-full" onclick="startCall(true)">📹 VIDEO ANRUF</button>
-                <button class="btn btn-full" onclick="startCall(false)">📞 AUDIO ANRUF</button>
-            </div>
-        </div>
-
-        <!-- RAM CHAT -->
-        <div class="card">
-            <div class="card-title">FLÜCHTIGER RAM-CHAT</div>
-            <div class="chat-box" id="chatBox">
-                <div class="chat-msg system">System: Gib den Code ein und drücke Verbinden.</div>
-            </div>
-            <div class="input-group">
-                <input type="text" id="chatInput" placeholder="Nachricht eingeben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
-                <button class="btn" onclick="sendChatMessage()">SENDEN</button>
-            </div>
-        </div>
-
-        <footer class="app-footer">
-            E2E ENCRYPTED • ZERO LOGS • DIRECT P2P TUNNEL
-        </footer>
+<div class="container">
+    <div class="header">
+        <div class="brand">#NULLSEC INSTANT</div>
+        <div class="status" id="statusBadge">BEREIT</div>
     </div>
 
-    <!-- FULLSCREEN CALL OVERLAY -->
-    <div class="call-overlay" id="callOverlay">
-        <div class="remote-video-container">
-            <video id="fullscreenRemoteVideo" autoplay playsinline></video>
-        </div>
-
-        <div class="local-video-container">
-            <video id="fullscreenLocalVideo" autoplay muted playsinline></video>
-        </div>
-
-        <div class="call-header-info">
-            <div class="call-partner-name" id="callPartnerId">ANRUF AKTIV</div>
-            <div class="call-timer" id="callTimer">00:00</div>
-        </div>
-
-        <div class="call-controls">
-            <button class="call-btn call-btn-mute" id="btnMuteAudio" onclick="toggleAudio()">🎙️</button>
-            <button class="call-btn call-btn-video" id="btnMuteVideo" onclick="toggleVideo()">📹</button>
-            <button class="call-btn call-btn-hangup" onclick="hangUp()">❌</button>
+    <!-- CODE EINGABE (SOFORT AKTIV) -->
+    <div class="setup-box">
+        <div class="row">
+            <input type="text" id="myCode" readonly title="Dein eigener Code">
+            <input type="text" id="targetCode" placeholder="Code vom Partner eingeben..." oninput="checkAndConnect()">
         </div>
     </div>
 
-    <script>
-        // ZERO STORAGE PROTOCOL
-        try {
-            window.localStorage.clear();
-            window.sessionStorage.clear();
-            Storage.prototype.setItem = function() {};
-            Storage.prototype.getItem = function() { return null; };
-        } catch(e) {}
+    <div class="chat-box" id="chatBox">
+        <div class="msg sys">Dein eigener Code wird generiert. Tippe den Code deines Partners ein und schreibe direkt drauf los!</div>
+    </div>
 
-        let peer = null;
-        let dataConn = null;
-        let mediaCall = null;
-        let localStream = null;
-        let timerInterval = null;
-        let callSeconds = 0;
-        let progressInterval = null;
+    <div class="input-bar">
+        <input type="text" id="msgInput" placeholder="Nachricht schreiben..." onkeypress="if(event.key==='Enter') sendMsg()">
+        <button class="send-btn" onclick="sendMsg()">➤</button>
+    </div>
+</div>
 
-        let isAudioMuted = false;
-        let isVideoMuted = false;
+<script>
+    // Generiere einen zufälligen 6-stelligen Code für dich selbst
+    let myId = Math.floor(100000 + Math.random() * 900000).toString();
+    document.getElementById('myCode').value = "MEIN CODE: " + myId;
 
-        function initPeer() {
-            if(peer) peer.destroy();
-            
-            const urlHash = window.location.hash.replace('#', '');
-            const randomCode = (urlHash && urlHash.includes('nullsec-')) 
-                ? urlHash.replace('nullsec-', '') 
-                : Math.floor(100000 + Math.random() * 900000).toString();
-                
-            const fullId = "nullsec-" + randomCode;
-            
-            // Inklusive freier TURN-Relay Server für mobile Netze
-            peer = new Peer(fullId, {
-                debug: 0,
-                config: {
-                    iceServers: [
-                        { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:stun2.l.google.com:19302' },
-                        { urls: 'stun:stun.cloudflare.com:3478' },
-                        { urls: 'turn:openrelay.metered.ca:80', username: 'openrelay', credential: 'openrelay' },
-                        { urls: 'turn:openrelay.metered.ca:443', username: 'openrelay', credential: 'openrelay' }
-                    ],
-                    iceCandidatePoolSize: 10
-                }
-            });
+    let ws = null;
+    let activeChannel = "";
 
-            peer.on('open', (id) => {
-                document.getElementById('myPeerId').innerText = randomCode;
-                generateQRCode(randomCode);
-                logSystem(`Bereit. Dein Code: ${randomCode}`);
+    // Öffentlicher Hochgeschwindigkeits-Messaging-Kanal
+    function connectToChannel(channelId) {
+        if (!channelId || channelId.length !== 6) return;
+        
+        if (activeChannel === channelId && ws && ws.readyState === WebSocket.OPEN) return;
 
-                if (urlHash && urlHash !== fullId && urlHash.startsWith('nullsec-')) {
-                    const targetCode = urlHash.replace('nullsec-', '');
-                    document.getElementById('targetPeerId').value = targetCode;
-                    start5SecConnection();
-                }
-            });
+        if (ws) ws.close();
+        activeChannel = channelId;
 
-            peer.on('connection', (conn) => {
-                dataConn = conn;
-                setupChatListeners();
-                updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
-                logSystem("⚡ Partner hat sich verbunden!");
-            });
+        // Wir nutzen einen gemeinsamen Raum, der sich aus beiden Codes oder dem Zielcode ergibt, 
+        // damit beide Handys exakt denselben Tunnel nutzen.
+        // Sortierung garantiert, dass egal wer wen eintippt, derselbe Raum geöffnet wird.
+        const roomName = [myId, channelId].sort().join('_');
 
-            peer.on('call', async (call) => {
-                const acceptCall = confirm("Eingehender Video-Anruf! Annehmen?");
-                if (acceptCall) {
-                    try {
-                        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                        document.getElementById('fullscreenLocalVideo').srcObject = localStream;
-                        call.answer(localStream);
-                        
-                        call.on('stream', (remoteStream) => {
-                            document.getElementById('fullscreenRemoteVideo').srcObject = remoteStream;
-                        });
+        ws = new WebSocket(`wss://sockets.space/v1/nullsec_${roomName}`);
 
-                        mediaCall = call;
-                        openCallOverlay();
-                        logSystem("Anruf aktiv.");
-                    } catch(err) {
-                        alert("Kamera/Mikrofon Zugriff verweigert.");
-                    }
-                }
-            });
-        }
+        ws.onopen = () => {
+            document.getElementById('statusBadge').innerText = "LIVE & VERBUNDEN";
+            logSys(`Direkt verbunden mit Kanal #${channelId}! Du kannst schreiben.`);
+        };
 
-        function updateProgress(percent, label, badgeText) {
-            document.getElementById('progressBarFill').style.width = percent + "%";
-            document.getElementById('progressPercent').innerText = percent + "%";
-            if(label) document.getElementById('progressLabel').innerText = label;
-            if(badgeText) document.getElementById('statusBadge').innerHTML = `<div class="pulse-dot"></div> ${badgeText}`;
-        }
-
-        // VERBINDUNG MIT REAL-TIME STATUS
-        function start5SecConnection() {
-            const inputVal = document.getElementById('targetPeerId').value.trim();
-            if(!inputVal || inputVal.length < 6) return alert("Gib erst den 6-stelligen Code ein!");
-
-            const fullTargetId = "nullsec-" + inputVal;
-            const btn = document.getElementById('connectBtn');
-            btn.disabled = true;
-
-            clearInterval(progressInterval);
-            let currentProgress = 0;
-            updateProgress(10, "STATUS: SUCHE PARTNER...", "VERBINDET...");
-
-            dataConn = peer.connect(fullTargetId, { reliable: true });
-            setupChatListeners();
-
-            // Sanfter Ladebalken bis max 85%, wartet auf echtes 'open' Event
-            progressInterval = setInterval(() => {
-                if (currentProgress < 85) {
-                    currentProgress += 5;
-                    updateProgress(currentProgress, "STATUS: TUNNEL WIRD AUFGEBAUT...", "VERBINDET...");
-                }
-            }, 150);
-
-            // Timeout falls die Gegenseite nicht erreichbar ist
-            setTimeout(() => {
-                if (!dataConn || !dataConn.open) {
-                    clearInterval(progressInterval);
-                    updateProgress(0, "STATUS: FEHLER / CODES PRÜFEN", "FEHLER");
-                    btn.disabled = false;
-                    logSystem("❌ Verbindung fehlgeschlagen. Ist der andere Code korrekt & online?");
-                }
-            }, 8000);
-        }
-
-        function setupChatListeners() {
-            dataConn.on('open', () => {
-                clearInterval(progressInterval);
-                updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
-                document.getElementById('connectBtn').disabled = false;
-                logSystem("✅ Verbindung erfolgreich hergestellt!");
-            });
-
-            dataConn.on('data', (data) => {
-                addChatBubble(data, 'peer');
-            });
-
-            dataConn.on('close', () => {
-                logSystem("Verbindung getrennt.");
-                updateProgress(0, "STATUS: BEREIT", "STANDBY");
-            });
-
-            dataConn.on('error', (err) => {
-                clearInterval(progressInterval);
-                updateProgress(0, "STATUS: FEHLER", "FEHLER");
-                document.getElementById('connectBtn').disabled = false;
-            });
-        }
-
-        function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const msg = input.value.trim();
-            if(!msg) return;
-
-            if(dataConn && dataConn.open) {
-                dataConn.send(msg);
-                addChatBubble(msg, 'me');
-                input.value = '';
-            } else {
-                alert("Keine aktive Verbindung! Warte bis der Ladebalken 100% (TUNNEL AKTIV) zeigt.");
-            }
-        }
-
-        function addChatBubble(text, sender) {
-            const box = document.getElementById('chatBox');
-            const div = document.createElement('div');
-            div.className = `chat-msg ${sender}`;
-            div.innerText = text;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-        }
-
-        function logSystem(text) {
-            const box = document.getElementById('chatBox');
-            const div = document.createElement('div');
-            div.className = `chat-msg system`;
-            div.innerText = `[SYS] ${text}`;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-        }
-
-        async function startCall(withVideo) {
-            const inputVal = document.getElementById('targetPeerId').value.trim();
-            if(!inputVal) return alert("Gib erst den Code ein!");
-
+        ws.onmessage = (event) => {
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: withVideo, 
-                    audio: true 
-                });
-                document.getElementById('fullscreenLocalVideo').srcObject = localStream;
+                const data = JSON.parse(event.data);
+                if (data.sender !== myId && data.text) {
+                    addMsg(data.text, 'peer');
+                }
+            } catch(e) {}
+        };
 
-                const fullTargetId = "nullsec-" + inputVal;
-                mediaCall = peer.call(fullTargetId, localStream);
+        ws.onerror = () => {
+            logSys("⚠️ Verbindung wird gehalten...");
+        };
+    }
 
-                mediaCall.on('stream', (remoteStream) => {
-                    document.getElementById('fullscreenRemoteVideo').srcObject = remoteStream;
-                });
+    // Sobald der Partner-Code eingetippt wird (automatisch ab 6 Ziffern), baut sich der Kanal ohne Klick auf
+    function checkAndConnect() {
+        const val = document.getElementById('targetCode').value.trim();
+        if (val.length === 6) {
+            connectToChannel(val);
+        }
+    }
 
-                openCallOverlay();
-                logSystem("Anruf wird gestartet...");
-            } catch(err) {
-                alert("Kamera oder Mikrofon konnte nicht gestartet werden.");
-            }
+    function sendMsg() {
+        const input = document.getElementById('msgInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        const target = document.getElementById('targetCode').value.trim();
+        if (target.length !== 6) {
+            alert("Bitte zuerst den 6-stelligen Code des Partners oben eingeben!");
+            return;
         }
 
-        function openCallOverlay() {
-            const targetId = document.getElementById('targetPeerId').value.trim() || "PARTNER";
-            document.getElementById('callPartnerId').innerText = "#" + targetId;
-            document.getElementById('callOverlay').classList.add('active');
-            
-            callSeconds = 0;
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                callSeconds++;
-                const mins = String(Math.floor(callSeconds / 60)).padStart(2, '0');
-                const secs = String(callSeconds % 60).padStart(2, '0');
-                document.getElementById('callTimer').innerText = `${mins}:${secs}`;
-            }, 1000);
+        // Sicherstellen, dass die Verbindung steht
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            connectToChannel(target);
         }
 
-        function hangUp() {
-            if(mediaCall) mediaCall.close();
-            if(localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
-            document.getElementById('fullscreenLocalVideo').srcObject = null;
-            document.getElementById('fullscreenRemoteVideo').srcObject = null;
-            document.getElementById('callOverlay').classList.remove('active');
-            clearInterval(timerInterval);
-            logSystem("Anruf beendet.");
-        }
-
-        function toggleAudio() {
-            if(localStream) {
-                isAudioMuted = !isAudioMuted;
-                localStream.getAudioTracks()[0].enabled = !isAudioMuted;
-                document.getElementById('btnMuteAudio').innerText = isAudioMuted ? "🔇" : "🎙️";
-            }
-        }
-
-        function toggleVideo() {
-            if(localStream && localStream.getVideoTracks().length > 0) {
-                isVideoMuted = !isVideoMuted;
-                localStream.getVideoTracks()[0].enabled = !isVideoMuted;
-                document.getElementById('btnMuteVideo').innerText = isVideoMuted ? "🚫" : "📹";
-            }
-        }
-
-        function copyFastLink() {
-            const currentCode = document.getElementById('myPeerId').innerText;
-            if(currentCode === '------') return;
-            const fastUrl = window.location.origin + window.location.pathname + '#nullsec-' + currentCode;
-            navigator.clipboard.writeText(fastUrl);
-            alert("⚡ Blitz-Link kopiert!");
-        }
-
-        function generateQRCode(code) {
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = '';
-            const fastUrl = window.location.origin + window.location.pathname + '#nullsec-' + code;
-            new QRCode(qrContainer, { text: fastUrl, width: 128, height: 128 });
-        }
-
-        function toggleQR() {
-            const qr = document.getElementById('qrcode');
-            qr.style.display = (qr.style.display === 'block') ? 'none' : 'block';
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            initPeer();
+        const payload = JSON.stringify({
+            sender: myId,
+            text: text
         });
-    </script>
+
+        // Sofortiges Senden
+        setTimeout(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(payload);
+            }
+        }, 50);
+
+        addMsg(text, 'me');
+        input.value = '';
+    }
+
+    function addMsg(text, type) {
+        const box = document.getElementById('chatBox');
+        const div = document.createElement('div');
+        div.className = `msg ${type}`;
+        
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        div.innerHTML = `${text}<span class="time">${time}</span>`;
+        
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function logSys(text) {
+        const box = document.getElementById('chatBox');
+        const div = document.createElement('div');
+        div.className = 'msg sys';
+        div.innerText = text;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    // Direkt beim Start eigenen Code ins System laden
+    logSys(`Dein Code ist #${myId}. Gib den Code deines Partners ein, um sofort zu starten.`);
+</script>
+
 </body>
 </html>
