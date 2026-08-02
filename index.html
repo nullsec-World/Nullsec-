@@ -3,197 +3,318 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WhatsApp E2EE Private Chat</title>
+    <title>#NULLSEC • Ultimate Messenger</title>
     <style>
         :root {
             --bg-dark: #0b141a;
             --panel-bg: #111b21;
+            --header-bg: #202c33;
             --neon-green: #00a884;
-            --msg-me: #005c4b;
-            --msg-peer: #202c33;
             --text-main: #e9edef;
             --text-muted: #8696a0;
+            --msg-me: #005c4b;
+            --msg-peer: #202c33;
+            --input-bg: #2a3942;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: var(--bg-dark); color: var(--text-main); height: 100vh; display: flex; justify-content: center; }
-
-        .app-container {
-            width: 100%; max-width: 500px; height: 100%; background: var(--panel-bg); display: flex; flex-direction: column;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            height: 100%;
+            background: var(--panel-bg);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        @media (min-width: 601px) {
+            .container {
+                height: 94vh;
+                border-radius: 16px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            }
+        }
+
+        /* HEADER */
         .header {
-            padding: 14px 16px; background: #202c33; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: var(--header-bg);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .title { color: var(--neon-green); font-weight: bold; font-size: 1.1rem; }
-        .badge { font-size: 0.65rem; background: rgba(0, 168, 132, 0.15); color: var(--neon-green); padding: 4px 8px; border-radius: 10px; font-weight: bold; }
 
-        .config-box {
-            padding: 12px; background: #111b21; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);
+        .brand {
+            font-weight: 900;
+            color: var(--neon-green);
+            font-size: 1.1rem;
+            letter-spacing: 1px;
         }
-        .row { display: flex; gap: 8px; }
+
+        .status {
+            font-size: 0.7rem;
+            color: var(--neon-green);
+            background: rgba(0, 168, 132, 0.1);
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        /* SETUP BOX */
+        .setup-box {
+            background: var(--panel-bg);
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+        }
+
         input {
-            flex: 1; background: #2a3942; border: none; padding: 10px 14px; border-radius: 8px; color: #fff; font-size: 0.9rem; outline: none;
+            flex: 1;
+            background: var(--input-bg);
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
         }
+
+        input:focus {
+            box-shadow: 0 0 0 1px var(--neon-green);
+        }
+
         button {
-            background: var(--neon-green); color: #111b21; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;
+            background: var(--neon-green);
+            color: #111b21;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
         }
 
-        .chat-area {
-            flex: 1; background: #0b141a; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
+        button:active {
+            opacity: 0.8;
         }
+
+        /* CHAT BEREICH */
+        .chat-box {
+            flex: 1;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 24px 24px;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
         .msg {
-            max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; word-break: break-word; line-height: 1.4;
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            word-break: break-word;
+            position: relative;
         }
-        .msg.me { background: var(--msg-me); align-self: flex-end; }
-        .msg.peer { background: var(--msg-peer); align-self: flex-start; }
-        .msg.sys { background: rgba(255,255,255,0.05); color: var(--text-muted); align-self: center; font-size: 0.75rem; text-align: center; }
 
-        .input-bar { padding: 10px; background: #202c33; display: flex; gap: 8px; }
-        .input-bar input { border-radius: 20px; }
-        .send-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--neon-green); border: none; font-size: 1.1rem; cursor: pointer; flex-shrink: 0; }
+        .msg.me {
+            background: var(--msg-me);
+            align-self: flex-end;
+            border-top-right-radius: 0;
+        }
+
+        .msg.peer {
+            background: var(--msg-peer);
+            align-self: flex-start;
+            border-top-left-radius: 0;
+        }
+
+        .msg.sys {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+            align-self: center;
+            font-size: 0.75rem;
+            text-align: center;
+            border-radius: 6px;
+            max-width: 95%;
+        }
+
+        .time {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            float: right;
+            margin-left: 8px;
+            margin-top: 4px;
+        }
+
+        /* INPUT LEISTE */
+        .input-bar {
+            background: var(--header-bg);
+            padding: 10px 16px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-bar input {
+            border-radius: 20px;
+            padding: 12px 18px;
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--neon-green);
+            color: #111b21;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="container">
+    <!-- HEADER -->
     <div class="header">
-        <div class="title">🔐 E2EE CHAT</div>
-        <div class="badge" id="cryptoStatus">🔒 256-BIT ENCRYPTED</div>
+        <div class="brand">#NULLSEC CHAT</div>
+        <div class="status" id="statusBadge">BEREIT</div>
     </div>
 
-    <div class="config-box">
+    <!-- CONFIG / RAUM WAHL -->
+    <div class="setup-box">
         <div class="row">
-            <input type="text" id="roomInput" placeholder="Gemeinsamen Raum-Namen eingeben...">
-            <input type="password" id="passInput" placeholder="Geheimer Schlüssel (Passwort)...">
+            <input type="text" id="roomInput" placeholder="Gemeinsamer Raumname (z.B. nullsec99)...">
+            <button onclick="joinRoom()">VERBINDEN</button>
         </div>
-        <button onclick="startSession()">CHATTEN STARTEN</button>
     </div>
 
-    <div class="chat-area" id="chatArea">
-        <div class="msg sys">Gib denselben Raum-Namen und das gleiche Passwort wie dein Partner ein.</div>
+    <!-- CHAT VERLAUF -->
+    <div class="chat-box" id="chatBox">
+        <div class="msg sys">Gib denselben Raumnamen ein und klicke auf Verbinden.</div>
     </div>
 
+    <!-- NACHRICHT SCHREIBEN -->
     <div class="input-bar">
-        <input type="text" id="msgInput" placeholder="Verschlüsselte Nachricht..." onkeypress="if(event.key==='Enter') sendMsg()">
+        <input type="text" id="msgInput" placeholder="Nachricht..." onkeypress="if(event.key==='Enter') sendMsg()">
         <button class="send-btn" onclick="sendMsg()">➤</button>
     </div>
 </div>
 
 <script>
-    let room = "";
-    let cryptoKey = null;
     let ws = null;
+    let currentRoom = "";
+    let myId = Math.random().toString(36).substring(7);
 
-    // Erzeugt aus dem Passwort einen echten 256-Bit AES-GCM Crypto-Key im Handy-Speicher
-    async function deriveKey(password) {
-        const enc = new TextEncoder();
-        const keyMaterial = await crypto.subtle.importKey(
-            "raw", enc.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]
-        );
-        return crypto.subtle.deriveKey(
-            {
-                name: "PBKDF2",
-                salt: enc.encode("NullSecSalt2026"),
-                iterations: 100000,
-                hash: "SHA-256"
-            },
-            keyMaterial,
-            { name: "AES-GCM", length: 256 },
-            false,
-            ["encrypt", "decrypt"]
-        );
-    }
+    function joinRoom() {
+        const val = document.getElementById('roomInput').value.trim();
+        if(!val) {
+            alert("Bitte einen Raumnamen eingeben!");
+            return;
+        }
 
-    async function startSession() {
-        const r = document.getElementById('roomInput').value.trim();
-        const p = document.getElementById('passInput').value.trim();
+        currentRoom = val;
+        if(ws) ws.close();
 
-        if (!r || !p) return alert("Bitte Raum und Geheim-Passwort eingeben!");
+        logSys(`Verbinde mit Raum "${currentRoom}"...`);
 
-        room = r;
-        cryptoKey = await deriveKey(p);
-
-        // Verbinde mit einem stabilen, weltweiten WebSocket Relay
-        if (ws) ws.close();
-        
-        // Öffentlicher Relay-Server, der von keinem Handy-Provider blockiert wird
-        ws = new WebSocket(`wss://free.piehost.com/v3/${encodeURIComponent(room)}?api_key=o75zS7U1G851wYwS8X09`);
+        // Extrem stabiler, öffentlicher Relay-WebSocket für blitzschnellen Datenaustausch
+        ws = new WebSocket(`wss://sockets.space/v1/nullsec_${currentRoom}`);
 
         ws.onopen = () => {
-            logSys(`Verbunden mit Raum "${room}". 1-zu-1 Verschlüsselung aktiv!`);
+            document.getElementById('statusBadge').innerText = "LIVE & VERBUNDEN";
+            logSys("Verbindung aktiv! Nachrichten kommen in Echtzeit an.");
         };
 
-        ws.onmessage = async (e) => {
+        ws.onmessage = (event) => {
             try {
-                const data = JSON.parse(e.data);
-                if (data && data.ciphertext && data.iv) {
-                    const decrypted = await decryptMessage(data.ciphertext, data.iv);
-                    if (decrypted) addBubble(decrypted, 'peer');
+                const data = JSON.parse(event.data);
+                // Nur Nachrichten von anderen anzeigen
+                if(data.sender !== myId && data.text) {
+                    addMsg(data.text, 'peer');
                 }
-            } catch(err) {
-                // Nachrichten von anderen Räumen oder falschem Passwort ignorieren
-            }
+            } catch(e) {}
         };
 
-        ws.onerror = () => logSys("Verbindungsfehler. Überprüfe dein Netz.");
-    }
+        ws.onerror = () => {
+            logSys("⚠️ Verbindungs-Hinweis: Versuche erneut zu verbinden...");
+        };
 
-    async function encryptMessage(text) {
-        const enc = new TextEncoder();
-        const iv = crypto.getRandomValues(new Uint8Array(12));
-        const encrypted = await crypto.subtle.encrypt(
-            { name: "AES-GCM", iv: iv },
-            cryptoKey,
-            enc.encode(text)
-        );
-        return {
-            ciphertext: Array.from(new Uint8Array(encrypted)),
-            iv: Array.from(iv)
+        ws.onclose = () => {
+            document.getElementById('statusBadge').innerText = "GETRENNT";
         };
     }
 
-    async function decryptMessage(ciphertext, iv) {
-        try {
-            const dec = new TextDecoder();
-            const decrypted = await crypto.subtle.decrypt(
-                { name: "AES-GCM", iv: new Uint8Array(iv) },
-                cryptoKey,
-                new Uint8Array(ciphertext)
-            );
-            return dec.decode(decrypted);
-        } catch(e) {
-            return null; // Falsches Passwort = Entschlüsselung schlägt fehl
-        }
-    }
-
-    async function sendMsg() {
+    function sendMsg() {
         const input = document.getElementById('msgInput');
         const text = input.value.trim();
+        if(!text) return;
 
-        if (!text) return;
-        if (!cryptoKey || !ws || ws.readyState !== WebSocket.OPEN) {
-            return alert("Klicke zuerst auf 'CHATTEN STARTEN'!");
+        if(!currentRoom || !ws || ws.readyState !== WebSocket.OPEN) {
+            alert("Bitte erst oben einen Raumnamen eingeben und auf Verbinden klicken!");
+            return;
         }
 
-        const payload = await encryptMessage(text);
-        ws.send(JSON.stringify(payload));
+        const payload = JSON.stringify({
+            sender: myId,
+            text: text
+        });
 
-        addBubble(text, 'me');
+        ws.send(payload);
+        addMsg(text, 'me');
         input.value = '';
     }
 
-    function addBubble(text, type) {
-        const box = document.getElementById('chatArea');
+    function addMsg(text, type) {
+        const box = document.getElementById('chatBox');
         const div = document.createElement('div');
         div.className = `msg ${type}`;
-        div.innerText = text;
+        
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        div.innerHTML = `${text}<span class="time">${time}</span>`;
+        
         box.appendChild(div);
         box.scrollTop = box.scrollHeight;
     }
 
     function logSys(text) {
-        const box = document.getElementById('chatArea');
+        const box = document.getElementById('chatBox');
         const div = document.createElement('div');
         div.className = 'msg sys';
         div.innerText = text;
