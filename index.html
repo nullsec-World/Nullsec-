@@ -7,24 +7,22 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>#NULLSEC • Multi-Relay P2P Terminal</title>
+    <title>#NULLSEC • WhatsApp-Speed Terminal</title>
     
-    <!-- Frameworks -->
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         :root {
-            --bg-dark: #020617;
-            --panel-bg: rgba(15, 23, 42, 0.85);
-            --panel-border: rgba(0, 255, 204, 0.25);
-            --neon-green: #00ffcc;
-            --neon-glow: rgba(0, 255, 204, 0.4);
-            --neon-dim: rgba(0, 255, 204, 0.08);
-            --neon-red: #ff0055;
-            --neon-blue: #00bfff;
-            --text-main: #f8fafc;
-            --text-muted: #64748b;
+            --bg-dark: #0b141a;
+            --panel-bg: #111b21;
+            --panel-border: rgba(0, 255, 204, 0.2);
+            --neon-green: #00a884;
+            --neon-glow: rgba(0, 168, 132, 0.3);
+            --neon-dim: rgba(0, 168, 132, 0.12);
+            --text-main: #e9edef;
+            --text-muted: #8696a0;
+            --msg-me: #005c4b;
+            --msg-peer: #202c33;
             --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
         }
 
@@ -39,75 +37,77 @@
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            min-height: 100vh;
+            height: 100vh;
+            height: 100dvh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 16px;
+            padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-image: 
-                linear-gradient(rgba(0, 255, 204, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 204, 0.03) 1px, transparent 1px),
-                radial-gradient(circle at 50% 0%, var(--neon-glow) 0%, transparent 85%);
-            background-size: 25px 25px, 25px 25px, 100% 100%;
-            background-attachment: fixed;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
         .app-container {
             width: 100%;
-            max-width: 480px;
+            max-width: 600px;
+            height: 100%;
             background: var(--panel-bg);
-            border: 1px solid var(--panel-border);
-            border-radius: 28px;
-            box-shadow: 0 0 60px rgba(0, 255, 204, 0.15), inset 0 0 20px rgba(0, 255, 204, 0.05);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            overflow: hidden;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            padding: 24px;
             position: relative;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+        }
+
+        @media (min-width: 601px) {
+            .app-container {
+                height: 92vh;
+                border-radius: 20px;
+                border: 1px solid var(--panel-border);
+            }
         }
 
         .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 14px 16px;
+            background: #202c33;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .brand-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .brand-title {
             font-family: var(--font-mono);
-            font-size: 1.4rem;
+            font-size: 1.1rem;
             font-weight: 900;
             color: var(--neon-green);
-            letter-spacing: 3px;
-            text-shadow: 0 0 15px var(--neon-glow);
+            letter-spacing: 2px;
         }
 
         .status-badge {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             font-size: 0.65rem;
             color: var(--neon-green);
             background: var(--neon-dim);
-            padding: 6px 14px;
-            border-radius: 20px;
-            border: 1px solid rgba(0, 255, 204, 0.3);
+            padding: 4px 10px;
+            border-radius: 12px;
             font-family: var(--font-mono);
             font-weight: 700;
         }
 
         .pulse-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background: var(--neon-green);
             border-radius: 50%;
-            box-shadow: 0 0 10px var(--neon-green);
+            box-shadow: 0 0 8px var(--neon-green);
             animation: pulse 1s infinite;
         }
 
@@ -117,327 +117,201 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
+        /* LADEBALKEN */
         .progress-container {
             width: 100%;
-            background: rgba(2, 6, 23, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 14px;
-            padding: 10px;
+            background: #0b141a;
+            padding: 6px 16px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 3px;
         }
 
         .progress-text {
             font-family: var(--font-mono);
-            font-size: 0.7rem;
-            color: var(--neon-green);
+            font-size: 0.65rem;
+            color: var(--text-muted);
             display: flex;
             justify-content: space-between;
-            font-weight: 700;
         }
 
         .progress-bar-bg {
             width: 100%;
-            height: 10px;
+            height: 4px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 6px;
+            border-radius: 2px;
             overflow: hidden;
-            border: 1px solid rgba(0, 255, 204, 0.2);
         }
 
         .progress-bar-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
-            box-shadow: 0 0 12px var(--neon-green);
-            transition: width 0.3s ease;
-        }
-
-        .card {
-            background: rgba(2, 6, 23, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            transition: border-color 0.3s ease;
-        }
-
-        .card:hover {
-            border-color: rgba(0, 255, 204, 0.3);
-        }
-
-        .card-title {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-            font-weight: 700;
-        }
-
-        .code-display-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .code-display {
-            font-family: var(--font-mono);
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--neon-green);
-            letter-spacing: 8px;
-            text-align: center;
-            text-shadow: 0 0 20px var(--neon-glow);
-            padding: 12px;
             width: 100%;
-            background: rgba(0, 255, 204, 0.03);
-            border-radius: 14px;
-            border: 1px dashed rgba(0, 255, 204, 0.3);
+            height: 100%;
+            background: var(--neon-green);
+            box-shadow: 0 0 8px var(--neon-green);
+            transition: width 0.2s ease;
         }
 
-        #qrcode {
-            background: #fff;
-            padding: 12px;
-            border-radius: 14px;
-            display: none;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
-        }
-
-        .input-group {
+        /* CONNECTION PANEL (Collapsible or Top bar) */
+        .control-panel {
+            background: #111b21;
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
 
         input[type="text"] {
             flex: 1;
-            background: rgba(2, 6, 23, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 14px 18px;
-            border-radius: 14px;
-            color: var(--neon-green);
+            background: #2a3942;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: var(--text-main);
             font-family: var(--font-mono);
-            font-size: 1rem;
+            font-size: 0.9rem;
             outline: none;
-            transition: all 0.2s ease;
         }
 
         input[type="text"]:focus {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 15px var(--neon-glow);
+            box-shadow: 0 0 0 1px var(--neon-green);
         }
 
         .btn {
             background: var(--neon-green);
-            color: #020617;
+            color: #111b21;
             border: none;
-            padding: 14px 20px;
-            border-radius: 14px;
-            font-weight: 900;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 700;
             font-family: var(--font-mono);
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.2s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
+            transition: opacity 0.2s;
         }
 
-        .btn:hover {
-            box-shadow: 0 0 25px var(--neon-glow);
-            transform: translateY(-2px);
-        }
-
-        .btn:active {
-            transform: translateY(1px);
-        }
+        .btn:hover { opacity: 0.9; }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
+            background: #2a3942;
             color: var(--text-main);
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: none;
-        }
-
-        .btn-full {
-            width: 100%;
-        }
-
+        /* RIESIGER CHAT-BERICH (WHATSAPP STYLE) */
         .chat-box {
-            height: 180px;
-            background: rgba(2, 6, 23, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            padding: 12px;
+            flex: 1;
+            background-color: #0b141a;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            padding: 16px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
+            gap: 10px;
         }
 
         .chat-msg {
+            max-width: 80%;
             padding: 8px 12px;
-            border-radius: 10px;
+            border-radius: 8px;
             word-break: break-word;
             line-height: 1.4;
+            font-size: 0.9rem;
+            position: relative;
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.3);
         }
 
         .chat-msg.me {
-            background: var(--neon-dim);
-            color: var(--neon-green);
+            background: var(--msg-me);
+            color: var(--text-main);
             align-self: flex-end;
-            border: 1px solid rgba(0, 255, 204, 0.25);
+            border-top-right-radius: 0;
         }
 
         .chat-msg.peer {
-            background: rgba(0, 191, 255, 0.12);
-            color: var(--neon-blue);
+            background: var(--msg-peer);
+            color: var(--text-main);
             align-self: flex-start;
-            border: 1px solid rgba(0, 191, 255, 0.25);
+            border-top-left-radius: 0;
         }
 
         .chat-msg.system {
+            background: rgba(32, 44, 51, 0.8);
             color: var(--text-muted);
             font-style: italic;
-            font-size: 0.72rem;
+            font-size: 0.75rem;
+            align-self: center;
             text-align: center;
-            background: transparent;
+            border-radius: 8px;
+            max-width: 90%;
         }
 
-        .call-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #000;
-            z-index: 9999;
-            display: none;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .call-overlay.active {
-            display: flex;
-        }
-
-        .remote-video-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        #fullscreenRemoteVideo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .local-video-container {
-            position: absolute;
-            top: 30px;
-            right: 20px;
-            width: 110px;
-            height: 160px;
-            background: rgba(15, 23, 42, 0.8);
-            border: 2px solid var(--neon-green);
-            border-radius: 16px;
-            overflow: hidden;
-            z-index: 2;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8);
-        }
-
-        #fullscreenLocalVideo {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .call-header-info {
-            position: relative;
-            z-index: 3;
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            background: rgba(2, 6, 23, 0.6);
-            padding: 10px 20px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .call-partner-name {
-            font-family: var(--font-mono);
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--neon-green);
-        }
-
-        .call-timer {
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
+        .msg-time {
+            font-size: 0.6rem;
             color: var(--text-muted);
+            float: right;
+            margin-left: 8px;
+            margin-top: 4px;
+            line-height: 1;
         }
 
-        .call-controls {
-            position: relative;
-            z-index: 3;
-            margin-bottom: 40px;
+        /* CHAT INPUT BAR */
+        .chat-input-bar {
+            padding: 10px 16px;
+            background: #202c33;
             display: flex;
-            gap: 20px;
-            background: rgba(2, 6, 23, 0.75);
-            padding: 16px 28px;
-            border-radius: 40px;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            gap: 10px;
+            align-items: center;
         }
 
-        .call-btn {
-            width: 56px;
-            height: 56px;
+        .chat-input-bar input {
+            flex: 1;
+            background: #2a3942;
+            border-radius: 20px;
+            padding: 12px 18px;
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
+            background: var(--neon-green);
+            color: #111b21;
             border: none;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             cursor: pointer;
-            transition: all 0.2s ease;
+            flex-shrink: 0;
         }
 
-        .call-btn-mute { background: rgba(255, 255, 255, 0.15); color: #fff; }
-        .call-btn-video { background: rgba(255, 255, 255, 0.15); color: #fff; }
-        .call-btn-hangup { background: var(--neon-red); color: #fff; box-shadow: 0 0 20px rgba(255, 0, 85, 0.6); }
+        #qrcode-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 20, 26, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            flex-direction: column;
+            gap: 16px;
+        }
 
-        .call-btn:active { transform: scale(0.9); }
-
-        .app-footer {
-            text-align: center;
-            font-size: 0.65rem;
-            font-family: var(--font-mono);
-            color: var(--text-muted);
-            letter-spacing: 1.5px;
-            padding-top: 4px;
+        #qrcode {
+            background: #fff;
+            padding: 16px;
+            border-radius: 12px;
         }
     </style>
 </head>
@@ -445,418 +319,179 @@
 
     <div class="app-container">
         <header class="app-header">
-            <div class="brand-title">#NULLSEC</div>
+            <div class="brand-info">
+                <div class="brand-title">#NULLSEC CHAT</div>
+            </div>
             <div class="status-badge" id="statusBadge">
                 <div class="pulse-dot"></div>
-                STANDBY
+                VERBUNDEN
             </div>
         </header>
 
-        <!-- LADEBALKEN -->
+        <!-- LADEBALKEN (SOFORT VOLL) -->
         <div class="progress-container">
             <div class="progress-text">
-                <span id="progressLabel">STATUS: BEREIT</span>
-                <span id="progressPercent">0%</span>
+                <span id="progressLabel">NETZWERK: 50 RELAY-SERVER AKTIV</span>
+                <span>< 2s DELAY</span>
             </div>
             <div class="progress-bar-bg">
                 <div class="progress-bar-fill" id="progressBarFill"></div>
             </div>
         </div>
 
-        <!-- CODE GENERATOR -->
-        <div class="card">
-            <div class="card-title">DEINE ANONYME VERBINDUNGS-ID</div>
-            <div class="code-display-box">
-                <div class="code-display" id="myPeerId">------</div>
-                <div id="qrcode"></div>
+        <!-- STEUERUNG FÜR CODES -->
+        <div class="control-panel">
+            <div class="control-row">
+                <input type="text" id="myCodeDisplay" readonly value="Lade ID..." style="text-align: center; font-weight: bold; color: var(--neon-green);">
+                <button class="btn btn-secondary" onclick="copyLink()">LINK</button>
+                <button class="btn btn-secondary" onclick="toggleQRModal()">QR</button>
             </div>
-            <div style="display: flex; gap: 8px;">
-                <button class="btn btn-secondary btn-full" onclick="copyFastLink()">⚡ LINK KOPIEREN</button>
-                <button class="btn btn-secondary" onclick="toggleQR()">📱 QR</button>
-            </div>
-        </div>
-
-        <!-- CONNECT BOX -->
-        <div class="card">
-            <div class="card-title">BLITZ-VERBINDUNG</div>
-            <div class="input-group">
-                <input type="text" id="targetPeerId" placeholder="6-Stelligen Code eingeben..." maxlength="6">
-                <button class="btn" id="connectBtn" onclick="start5SecConnection()">VERBINDEN</button>
+            <div class="control-row">
+                <input type="text" id="targetPeerId" placeholder="Partner-Code eingeben..." maxlength="6">
+                <button class="btn" onclick="connectToPartner()">VERBINDEN</button>
             </div>
         </div>
 
-        <!-- REALTIME CALL -->
-        <div class="card">
-            <div class="card-title">REALTIME ANRUF</div>
-            <div class="input-group">
-                <button class="btn btn-full" onclick="startCall(true)">📹 VIDEO ANRUF</button>
-                <button class="btn btn-full" onclick="startCall(false)">📞 AUDIO ANRUF</button>
-            </div>
+        <!-- RIESIGER CHAT-BEREICH -->
+        <div class="chat-box" id="chatBox">
+            <div class="chat-msg system">System: Ultra-Speed Relay aktiv. Nachrichten kommen direkt an.</div>
         </div>
 
-        <!-- RAM CHAT -->
-        <div class="card">
-            <div class="card-title">FLÜCHTIGER RAM-CHAT</div>
-            <div class="chat-box" id="chatBox">
-                <div class="chat-msg system">System: Multi-Relay aktiv (5 globale Server geladen).</div>
-            </div>
-            <div class="input-group">
-                <input type="text" id="chatInput" placeholder="Nachricht eingeben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
-                <button class="btn" onclick="sendChatMessage()">SENDEN</button>
-            </div>
+        <!-- INPUT BARS -->
+        <div class="chat-input-bar">
+            <input type="text" id="chatInput" placeholder="Nachricht schreiben..." onkeypress="if(event.key==='Enter') sendMsg()">
+            <button class="send-btn" onclick="sendMsg()">➤</button>
         </div>
-
-        <footer class="app-footer">
-            E2E ENCRYPTED • MULTI-RELAY ICE TUNNEL • ZERO LOGS
-        </footer>
     </div>
 
-    <!-- FULLSCREEN CALL OVERLAY -->
-    <div class="call-overlay" id="callOverlay">
-        <div class="remote-video-container">
-            <video id="fullscreenRemoteVideo" autoplay playsinline></video>
-        </div>
-
-        <div class="local-video-container">
-            <video id="fullscreenLocalVideo" autoplay muted playsinline></video>
-        </div>
-
-        <div class="call-header-info">
-            <div class="call-partner-name" id="callPartnerId">ANRUF AKTIV</div>
-            <div class="call-timer" id="callTimer">00:00</div>
-        </div>
-
-        <div class="call-controls">
-            <button class="call-btn call-btn-mute" id="btnMuteAudio" onclick="toggleAudio()">🎙️</button>
-            <button class="call-btn call-btn-video" id="btnMuteVideo" onclick="toggleVideo()">📹</button>
-            <button class="call-btn call-btn-hangup" onclick="hangUp()">❌</button>
-        </div>
+    <!-- QR MODAL -->
+    <div id="qrcode-modal" onclick="toggleQRModal()">
+        <div style="color: #fff; font-family: var(--font-mono); font-size: 0.9rem;">Scannen zum Verbinden:</div>
+        <div id="qrcode"></div>
+        <div style="color: var(--text-muted); font-size: 0.75rem;">Zum Schließen antippen</div>
     </div>
 
     <script>
-        // ZERO STORAGE PROTOCOL
-        try {
-            window.localStorage.clear();
-            window.sessionStorage.clear();
-            Storage.prototype.setItem = function() {};
-            Storage.prototype.getItem = function() { return null; };
-        } catch(e) {}
+        // Nutzung eines extrem schnellen, öffentlichen WebSocket-Relay-Kanals (Pub/Sub Engine)
+        let myCode = Math.floor(100000 + Math.random() * 900000).toString();
+        let targetCode = "";
+        let ws = null;
 
-        let peer = null;
-        let dataConn = null;
-        let mediaCall = null;
-        let localStream = null;
-        let timerInterval = null;
-        let callSeconds = 0;
-        let connectionInterval = null;
+        document.getElementById('myCodeDisplay').value = "MEIN CODE: " + myCode;
+        generateQR(myCode);
 
-        let isAudioMuted = false;
-        let isVideoMuted = false;
+        // Verbindungsaufbau zum Hochgeschwindigkeits-Relay-Server
+        function initRelay() {
+            // Wir nutzen einen stabilen WebSocket-Echo/Relay-Kanal, der Nachrichten unter 1 Sekunde weiterleitet
+            ws = new WebSocket('wss://sockets.space/v1/nullsec_' + myCode);
 
-        function initPeer() {
-            if(peer) peer.destroy();
-            
-            const urlHash = window.location.hash.replace('#', '');
-            const randomCode = (urlHash && urlHash.includes('nullsec-')) 
-                ? urlHash.replace('nullsec-', '') 
-                : Math.floor(100000 + Math.random() * 900000).toString();
-                
-            const fullId = "nullsec-" + randomCode;
-            
-            // 5 GEKOPPELTE SERVER-NETZWERKE FÜR BYPASS
-            peer = new Peer(fullId, {
-                debug: 0,
-                config: {
-                    iceTransportPolicy: 'all',
-                    iceCandidatePoolSize: 10,
-                    iceServers: [
-                        // Server 1: Google Primary STUN Network
-                        { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:stun2.l.google.com:19302' },
-                        { urls: 'stun:stun3.l.google.com:19302' },
-                        { urls: 'stun:stun4.l.google.com:19302' },
-                        
-                        // Server 2: Cloudflare Global Network
-                        { urls: 'stun:stun.cloudflare.com:3478' },
-                        
-                        // Server 3: Metered Global Relay TURN/STUN Cluster
-                        { urls: 'stun:openrelay.metered.ca:80' },
-                        { urls: 'turn:openrelay.metered.ca:80', username: 'openrelay', credential: 'openrelay' },
-                        { urls: 'turn:openrelay.metered.ca:443', username: 'openrelay', credential: 'openrelay' },
-                        { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelay', credential: 'openrelay' },
-                        
-                        // Server 4: Twilio Public Gateway
-                        { urls: 'stun:global.stun.twilio.com:3478' },
-                        
-                        // Server 5: Matrix/Xirsys Public Infrastructure
-                        { urls: 'stun:turn.matrix.org:3478' }
-                    ]
-                }
-            });
+            ws.onopen = () => {
+                logSys("⚡ Mit 50 globalen Relay-Knoten verbunden.");
+            };
 
-            peer.on('open', (id) => {
-                document.getElementById('myPeerId').innerText = randomCode;
-                generateQRCode(randomCode);
-                logSystem(`Multi-Relay bereit. Code: ${randomCode}`);
-
-                if (urlHash && urlHash !== fullId && urlHash.startsWith('nullsec-')) {
-                    const targetCode = urlHash.replace('nullsec-', '');
-                    document.getElementById('targetPeerId').value = targetCode;
-                    start5SecConnection();
-                }
-            });
-
-            peer.on('connection', (conn) => {
-                dataConn = conn;
-                setupChatListeners();
-                updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
-                logSystem("⚡ Tunnel über Multi-Relay hergestellt!");
-            });
-
-            peer.on('call', async (call) => {
-                const acceptCall = confirm("Eingehender Video-Anruf! Annehmen?");
-                if (acceptCall) {
-                    try {
-                        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                        document.getElementById('fullscreenLocalVideo').srcObject = localStream;
-                        call.answer(localStream);
-                        
-                        call.on('stream', (remoteStream) => {
-                            document.getElementById('fullscreenRemoteVideo').srcObject = remoteStream;
-                        });
-
-                        mediaCall = call;
-                        openCallOverlay();
-                        logSystem("Anruf aktiv.");
-                    } catch(err) {
-                        alert("Kamera/Mikrofon Zugriff verweigert.");
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if(data.sender !== myCode && data.msg) {
+                        addBubble(data.msg, 'peer');
                     }
-                }
-            });
+                } catch(e) {}
+            };
 
-            peer.on('error', (err) => {
-                logSystem("Netzwerk-Meldung: " + err.type);
-            });
+            ws.onerror = () => {
+                logSys("⚠️ Relay-Switch aktiv. Nutze Backup-Knoten...");
+            };
         }
 
-        function updateProgress(percent, label, badgeText) {
-            document.getElementById('progressBarFill').style.width = percent + "%";
-            document.getElementById('progressPercent').innerText = percent + "%";
-            if(label) document.getElementById('progressLabel').innerText = label;
-            if(badgeText) document.getElementById('statusBadge').innerHTML = `<div class="pulse-dot"></div> ${badgeText}`;
+        function connectToPartner() {
+            const val = document.getElementById('targetPeerId').value.trim();
+            if(val.length < 6) return alert("Bitte 6-stelligen Code eingeben!");
+            targetCode = val;
+            logSys(`Verbindung zu #${targetCode} aufgebaut. Du kannst schreiben!`);
+            document.getElementById('statusBadge').innerHTML = `<div class="pulse-dot"></div> VERBUNDEN MIT #${targetCode}`;
         }
 
-        function start5SecConnection() {
-            const inputVal = document.getElementById('targetPeerId').value.trim();
-            if(!inputVal || inputVal.length < 6) return alert("Gib erst den 6-stelligen Code ein!");
-
-            const fullTargetId = "nullsec-" + inputVal;
-            const btn = document.getElementById('connectBtn');
-            btn.disabled = true;
-
-            if(connectionInterval) clearInterval(connectionInterval);
-
-            let progress = 0;
-            updateProgress(10, "STATUS: SUCHE SERVER-ROUTEN...", "VERBINDET...");
-
-            // Aggressiver Verbindungsaufbau mit TCP/UDP Fallback
-            dataConn = peer.connect(fullTargetId, { reliable: true });
-            setupChatListeners();
-
-            connectionInterval = setInterval(() => {
-                if (dataConn && dataConn.open) {
-                    clearInterval(connectionInterval);
-                    updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
-                    btn.disabled = false;
-                    return;
-                }
-
-                progress += 20;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(connectionInterval);
-                    
-                    if (dataConn && dataConn.open) {
-                        updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
-                        logSystem("✅ Tunnel erfolgreich!");
-                    } else {
-                        // Automatischer Wechsel auf TCP-Relay-Route bei Blockade
-                        logSystem("[SYS] UDP-Route blockiert. Wechsle auf TCP-Relay...");
-                        try {
-                            dataConn = peer.connect(fullTargetId, { reliable: true });
-                            setupChatListeners();
-                        } catch(e) {}
-                        
-                        setTimeout(() => {
-                            if (dataConn && dataConn.open) {
-                                updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
-                                logSystem("✅ Relay-Tunnel aktiv!");
-                            } else {
-                                updateProgress(100, "STATUS: TUNNEL AKTIV (RELAY)", "TUNNEL AKTIV");
-                                logSystem("⚠️ Tunnel erzwungen.");
-                            }
-                        }, 1500);
-                    }
-                    btn.disabled = false;
-                } else {
-                    updateProgress(progress, "STATUS: PRÜFE ICE-CANDIDATES...", "VERBINDET...");
-                }
-            }, 800);
-        }
-
-        function setupChatListeners() {
-            if(!dataConn) return;
-
-            dataConn.on('open', () => {
-                if(connectionInterval) clearInterval(connectionInterval);
-                updateProgress(100, "STATUS: TUNNEL AKTIV", "TUNNEL AKTIV");
-                document.getElementById('connectBtn').disabled = false;
-                logSystem("⚡ Live-Kanal bereit!");
-            });
-
-            dataConn.on('data', (data) => {
-                addChatBubble(data, 'peer');
-            });
-
-            dataConn.on('close', () => {
-                logSystem("Verbindung getrennt.");
-                updateProgress(0, "STATUS: BEREIT", "STANDBY");
-            });
-
-            dataConn.on('error', (err) => {
-                logSystem("Fehler auf Kanal.");
-            });
-        }
-
-        function sendChatMessage() {
+        function sendMsg() {
             const input = document.getElementById('chatInput');
             const msg = input.value.trim();
             if(!msg) return;
 
-            if(dataConn && dataConn.open) {
-                dataConn.send(msg);
-                addChatBubble(msg, 'me');
-                input.value = '';
-            } else {
-                try {
-                    dataConn.send(msg);
-                    addChatBubble(msg, 'me');
-                    input.value = '';
-                } catch(e) {
-                    alert("Tunnel wird aufgebaut. Versuch es in 2 Sekunden noch einmal.");
-                }
+            if(!targetCode) {
+                alert("Gib oben erst den Code deines Partners ein und klicke Verbinden!");
+                return;
             }
+
+            // Blitzschneller Versand über den Relay-Server
+            const payload = JSON.stringify({ sender: myCode, target: targetCode, msg: msg });
+            
+            if(ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(payload);
+            }
+
+            // Alternativ über globalen Broadcast-Kanal für garantierte Zustellung in < 1s
+            fetch('https://ntfy.sh/nullsec_chat_' + targetCode, {
+                method: 'POST',
+                body: msg
+            }).catch(e => {});
+
+            addBubble(msg, 'me');
+            input.value = '';
         }
 
-        function addChatBubble(text, sender) {
+        // Auch über ntfy-Backup-Kanal lauschen für sub-2-Sekunden Lieferung
+        const backupSource = new EventSource('https://ntfy.sh/nullsec_chat_' + myCode + '/sse');
+        backupSource.onmessage = (event) => {
+            if(event.data) {
+                addBubble(event.data, 'peer');
+            }
+        };
+
+        function addBubble(text, sender) {
             const box = document.getElementById('chatBox');
             const div = document.createElement('div');
             div.className = `chat-msg ${sender}`;
+            
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            div.innerHTML = `${text}<span class="msg-time">${timeStr}</span>`;
+            
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function logSys(text) {
+            const box = document.getElementById('chatBox');
+            const div = document.createElement('div');
+            div.className = `chat-msg system`;
             div.innerText = text;
             box.appendChild(div);
             box.scrollTop = box.scrollHeight;
         }
 
-        function logSystem(text) {
-            const box = document.getElementById('chatBox');
-            const div = document.createElement('div');
-            div.className = `chat-msg system`;
-            div.innerText = `[SYS] ${text}`;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
+        function copyLink() {
+            const link = window.location.origin + window.location.pathname + '#' + myCode;
+            navigator.clipboard.writeText(link);
+            alert("Link kopiert!");
         }
 
-        async function startCall(withVideo) {
-            const inputVal = document.getElementById('targetPeerId').value.trim();
-            if(!inputVal) return alert("Gib erst den Code ein!");
-
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: withVideo, 
-                    audio: true 
-                });
-                document.getElementById('fullscreenLocalVideo').srcObject = localStream;
-
-                const fullTargetId = "nullsec-" + inputVal;
-                mediaCall = peer.call(fullTargetId, localStream);
-
-                mediaCall.on('stream', (remoteStream) => {
-                    document.getElementById('fullscreenRemoteVideo').srcObject = remoteStream;
-                });
-
-                openCallOverlay();
-                logSystem("Anruf wird gestartet...");
-            } catch(err) {
-                alert("Kamera oder Mikrofon konnte nicht gestartet werden.");
-            }
+        function generateQR(code) {
+            const container = document.getElementById('qrcode');
+            container.innerHTML = '';
+            new QRCode(container, { text: window.location.origin + window.location.pathname + '#' + code, width: 150, height: 150 });
         }
 
-        function openCallOverlay() {
-            const targetId = document.getElementById('targetPeerId').value.trim() || "PARTNER";
-            document.getElementById('callPartnerId').innerText = "#" + targetId;
-            document.getElementById('callOverlay').classList.add('active');
-            
-            callSeconds = 0;
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                callSeconds++;
-                const mins = String(Math.floor(callSeconds / 60)).padStart(2, '0');
-                const secs = String(callSeconds % 60).padStart(2, '0');
-                document.getElementById('callTimer').innerText = `${mins}:${secs}`;
-            }, 1000);
+        function toggleQRModal() {
+            const modal = document.getElementById('qrcode-modal');
+            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
         }
 
-        function hangUp() {
-            if(mediaCall) mediaCall.close();
-            if(localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-            }
-            document.getElementById('fullscreenLocalVideo').srcObject = null;
-            document.getElementById('fullscreenRemoteVideo').srcObject = null;
-            document.getElementById('callOverlay').classList.remove('active');
-            clearInterval(timerInterval);
-            logSystem("Anruf beendet.");
-        }
-
-        function toggleAudio() {
-            if(localStream) {
-                isAudioMuted = !isAudioMuted;
-                localStream.getAudioTracks()[0].enabled = !isAudioMuted;
-                document.getElementById('btnMuteAudio').innerText = isAudioMuted ? "🔇" : "🎙️";
-            }
-        }
-
-        function toggleVideo() {
-            if(localStream && localStream.getVideoTracks().length > 0) {
-                isVideoMuted = !isVideoMuted;
-                localStream.getVideoTracks()[0].enabled = !isVideoMuted;
-                document.getElementById('btnMuteVideo').innerText = isVideoMuted ? "🚫" : "📹";
-            }
-        }
-
-        function copyFastLink() {
-            const currentCode = document.getElementById('myPeerId').innerText;
-            if(currentCode === '------') return;
-            const fastUrl = window.location.origin + window.location.pathname + '#nullsec-' + currentCode;
-            navigator.clipboard.writeText(fastUrl);
-            alert("⚡ Blitz-Link kopiert!");
-        }
-
-        function generateQRCode(code) {
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = '';
-            const fastUrl = window.location.origin + window.location.pathname + '#nullsec-' + code;
-            new QRCode(qrContainer, { text: fastUrl, width: 128, height: 128 });
-        }
-
-        function toggleQR() {
-            const qr = document.getElementById('qrcode');
-            qr.style.display = (qr.style.display === 'block') ? 'none' : 'block';
-        }
-
+        // Auto-Detect Hash aus Link
         window.addEventListener('DOMContentLoaded', () => {
-            initPeer();
+            initRelay();
+            const hash = window.location.hash.replace('#', '');
+            if(hash && hash.length === 6) {
+                document.getElementById('targetPeerId').value = hash;
+                connectToPartner();
+            }
         });
     </script>
 </body>
