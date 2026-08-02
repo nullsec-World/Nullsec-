@@ -332,7 +332,7 @@
     }
 
     function saveMyProfile() {
-      myProfile.name = document.getElementById('input-my-name').value.trim() || "Anonym";
+      myProfile.name = document.getElementById('input-my-name').value.trim() || "Elyas";
       myProfile.avatar = tempAvatarBase64;
       localStorage.setItem('nullsec_profile', JSON.stringify(myProfile));
       updateMyProfileUI();
