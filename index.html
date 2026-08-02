@@ -6,135 +6,140 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>#NULLSEC - Ultra Fast Anonymous P2P</title>
+    <title>#NULLSEC • Ultra Fast P2P</title>
     
-    <!-- PeerJS CDN -->
+    <!-- PeerJS Framework -->
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <style>
         :root {
-            --bg-color: #030712;
-            --panel-bg: rgba(11, 17, 32, 0.9);
-            --accent-green: #00ffcc;
-            --accent-dim: rgba(0, 255, 204, 0.12);
-            --accent-red: #ff3366;
-            --text-main: #f3f4f6;
-            --text-muted: #6b7280;
-            --border-color: #1f2937;
-            --font-mono: 'Courier New', Courier, monospace;
+            --bg: #030712;
+            --card-bg: rgba(15, 23, 42, 0.75);
+            --accent: #00ffcc;
+            --accent-glow: rgba(0, 255, 204, 0.25);
+            --accent-dim: rgba(0, 255, 204, 0.08);
+            --danger: #ff3366;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            user-select: none;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 15px;
+            padding: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-image: 
-                radial-gradient(circle at 50% 50%, rgba(0, 255, 204, 0.05) 0%, transparent 80%),
-                linear-gradient(rgba(3, 7, 18, 0.95), rgba(3, 7, 18, 0.95));
+                radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 60%),
+                radial-gradient(circle at 100% 100%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+            background-attachment: fixed;
         }
 
         .app-container {
             width: 100%;
-            max-width: 480px;
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            box-shadow: 0 0 35px rgba(0, 255, 204, 0.2);
-            backdrop-filter: blur(16px);
+            max-width: 440px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px var(--accent-glow);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            gap: 16px;
+            padding: 20px;
         }
 
         .app-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(15, 23, 42, 0.8);
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .brand-logo {
+        .brand-title {
             font-family: var(--font-mono);
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 800;
-            color: var(--accent-green);
+            color: var(--accent);
             letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+            text-shadow: 0 0 12px var(--accent-glow);
         }
 
-        .status-pill {
+        .status-badge {
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.7rem;
-            color: var(--accent-green);
+            font-size: 0.65rem;
+            color: var(--accent);
             background: var(--accent-dim);
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 20px;
-            border: 1px solid rgba(0, 255, 204, 0.4);
+            border: 1px solid rgba(0, 255, 204, 0.3);
             font-family: var(--font-mono);
+            font-weight: 600;
         }
 
         .pulse-dot {
-            width: 6px;
-            height: 6px;
-            background: var(--accent-green);
+            width: 7px;
+            height: 7px;
+            background: var(--accent);
             border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-green);
-            animation: pulse 1s infinite;
+            box-shadow: 0 0 8px var(--accent);
+            animation: pulse 1.2s infinite;
         }
 
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.2; }
-            100% { opacity: 1; }
-        }
-
-        .app-body {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
         .card {
-            background: rgba(2, 6, 23, 0.8);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+            background: rgba(2, 6, 23, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 16px;
             padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        .card-label {
+        .card-title {
             font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             color: var(--text-muted);
-            margin-bottom: 8px;
             font-family: var(--font-mono);
+            font-weight: 700;
         }
 
         .code-display {
             font-family: var(--font-mono);
-            font-size: 2.4rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            color: var(--accent-green);
-            letter-spacing: 4px;
+            color: var(--accent);
+            letter-spacing: 6px;
             text-align: center;
-            text-shadow: 0 0 12px rgba(0, 255, 204, 0.4);
-            margin: 4px 0;
+            text-shadow: 0 0 15px var(--accent-glow);
+            padding: 8px 0;
+            background: rgba(0, 255, 204, 0.03);
+            border-radius: 12px;
+            border: 1px dashed rgba(0, 255, 204, 0.2);
         }
 
         .input-group {
@@ -144,47 +149,68 @@
 
         input[type="text"] {
             flex: 1;
-            background: #020617;
-            border: 1px solid var(--border-color);
-            padding: 12px 14px;
-            border-radius: 8px;
-            color: var(--accent-green);
+            background: rgba(2, 6, 23, 0.9);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: var(--accent);
             font-family: var(--font-mono);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             outline: none;
-            transition: border 0.2s;
+            transition: all 0.2s ease;
         }
 
         input[type="text"]:focus {
-            border-color: var(--accent-green);
+            border-color: var(--accent);
+            box-shadow: 0 0 12px var(--accent-glow);
         }
 
         .btn {
-            background: var(--accent-green);
-            color: #000;
+            background: var(--accent);
+            color: #030712;
             border: none;
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-weight: 700;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-weight: 800;
             font-family: var(--font-mono);
+            font-size: 0.8rem;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             transition: all 0.15s ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
         }
 
         .btn:hover {
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
-            transform: scale(1.02);
+            box-shadow: 0 0 20px var(--accent-glow);
+            transform: translateY(-1px);
         }
 
         .btn:active {
-            transform: scale(0.98);
+            transform: translateY(1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: none;
         }
 
         .btn-danger {
-            background: var(--accent-red);
+            background: var(--danger);
             color: #fff;
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
         }
 
         .btn-full {
@@ -194,16 +220,15 @@
         .media-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 5px;
+            gap: 8px;
         }
 
         .video-wrapper {
             position: relative;
             aspect-ratio: 4/3;
             background: #000;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            border: 1px solid var(--border);
             overflow: hidden;
         }
 
@@ -213,76 +238,68 @@
             object-fit: cover;
         }
 
-        .video-label {
+        .video-tag {
             position: absolute;
             bottom: 6px;
             left: 6px;
             font-size: 0.6rem;
             font-family: var(--font-mono);
-            background: rgba(0, 0, 0, 0.8);
-            padding: 2px 6px;
-            border-radius: 4px;
-            color: var(--accent-green);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 2px 8px;
+            border-radius: 6px;
+            color: var(--accent);
+            backdrop-filter: blur(4px);
         }
 
         .chat-box {
-            height: 160px;
-            background: #020617;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+            height: 140px;
+            background: rgba(2, 6, 23, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 12px;
             padding: 10px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             font-family: var(--font-mono);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
         .chat-msg {
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 2px solid var(--border-color);
             padding: 6px 10px;
-            border-radius: 0 6px 6px 0;
+            border-radius: 8px;
             word-break: break-word;
+            line-height: 1.3;
         }
 
         .chat-msg.me {
-            border-left-color: var(--accent-green);
             background: var(--accent-dim);
+            color: var(--accent);
+            align-self: flex-end;
+            border: 1px solid rgba(0, 255, 204, 0.2);
         }
 
         .chat-msg.peer {
-            border-left-color: #3b82f6;
-            background: rgba(59, 130, 246, 0.1);
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            align-self: flex-start;
+            border: 1px solid rgba(59, 130, 246, 0.3);
         }
 
         .chat-msg.system {
-            border-left-color: var(--text-muted);
             color: var(--text-muted);
             font-style: italic;
-        }
-
-        .vpn-bar {
-            display: flex;
-            justify-content: space-between;
             font-size: 0.7rem;
-            font-family: var(--font-mono);
-            color: var(--text-muted);
-        }
-
-        .vpn-bar span {
-            color: var(--accent-green);
+            text-align: center;
+            background: transparent;
         }
 
         .app-footer {
-            padding: 12px;
-            border-top: 1px solid var(--border-color);
             text-align: center;
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-family: var(--font-mono);
             color: var(--text-muted);
-            background: rgba(15, 23, 42, 0.4);
+            letter-spacing: 1px;
         }
     </style>
 </head>
@@ -290,73 +307,68 @@
 
     <div class="app-container">
         <header class="app-header">
-            <div class="brand-logo">#NULLSEC</div>
-            <div class="status-pill">
+            <div class="brand-title">#NULLSEC</div>
+            <div class="status-badge">
                 <div class="pulse-dot"></div>
-                RAM-ONLY / E2EE
+                RAM-ONLY / P2P
             </div>
         </header>
 
-        <main class="app-body">
-            
-            <div class="vpn-bar">
-                <div>ROUTE: <span id="vpnRoute">ROTATING...</span></div>
-                <div>DYNAMIC IP: <span id="vpnIp">0.0.0.0</span></div>
-            </div>
+        <!-- CODE GENERATOR -->
+        <div class="card">
+            <div class="card-title">DEINE ANONYME VERBINDUNGS-ID</div>
+            <div class="code-display" id="myPeerId">------</div>
+            <button class="btn btn-secondary btn-full" onclick="initPeer()">ID NEU GENERIEREN 🔄</button>
+        </div>
 
-            <div class="card">
-                <div class="card-label">DEINE ANONYME P2P-ID</div>
-                <div class="code-display" id="myPeerId">------</div>
-                <button class="btn btn-full" style="margin-top: 8px;" onclick="initPeer()">ID Neu Generieren</button>
+        <!-- CONNECT BOX -->
+        <div class="card">
+            <div class="card-title">BLITZ-VERBINDUNG</div>
+            <div class="input-group">
+                <input type="text" id="targetPeerId" placeholder="6-Stelligen Code eingeben..." maxlength="6">
+                <button class="btn" onclick="connectToPeer()">VERBINDEN</button>
             </div>
+        </div>
 
-            <div class="card">
-                <div class="card-label">BLITZ-VERBINDUNG (INSTANT P2P)</div>
-                <div class="input-group">
-                    <input type="text" id="targetPeerId" placeholder="6-stelligen Code eingeben...">
-                    <button class="btn" onclick="connectToPeer()">Verbinden</button>
+        <!-- MEDIA / CALLS -->
+        <div class="card">
+            <div class="card-title">PEER-TO-PEER MEDIA</div>
+            <div class="media-grid">
+                <div class="video-wrapper">
+                    <video id="localVideo" autoplay muted playsinline></video>
+                    <div class="video-tag">DU</div>
+                </div>
+                <div class="video-wrapper">
+                    <video id="remoteVideo" autoplay playsinline></video>
+                    <div class="video-tag">PARTNER</div>
                 </div>
             </div>
-
-            <div class="card">
-                <div class="card-label">ANRUF & VIDEO (PEER-TO-PEER)</div>
-                <div class="media-grid">
-                    <div class="video-wrapper">
-                        <video id="localVideo" autoplay muted playsinline></video>
-                        <div class="video-label">DU</div>
-                    </div>
-                    <div class="video-wrapper">
-                        <video id="remoteVideo" autoplay playsinline></video>
-                        <div class="video-label" id="peerVideoLabel">PARTNER</div>
-                    </div>
-                </div>
-                <div class="input-group" style="margin-top: 10px;">
-                    <button class="btn btn-full" onclick="startCall(true)">Video 📹</button>
-                    <button class="btn btn-full" onclick="startCall(false)">Audio 📞</button>
-                    <button class="btn btn-danger" onclick="hangUp()">Auflegen ❌</button>
-                </div>
+            <div class="input-group" style="margin-top: 6px;">
+                <button class="btn btn-full" onclick="startCall(true)">📹 VIDEO</button>
+                <button class="btn btn-full" onclick="startCall(false)">📞 AUDIO</button>
+                <button class="btn btn-danger" onclick="hangUp()">❌</button>
             </div>
+        </div>
 
-            <div class="card">
-                <div class="card-label">ECHTZEIT CHAT (FLÜCHTIGER RAM-SPEICHER)</div>
-                <div class="chat-box" id="chatBox">
-                    <div class="chat-msg system">System: Ultra-Fast High Priority Tunnel bereit.</div>
-                </div>
-                <div class="input-group" style="margin-top: 10px;">
-                    <input type="text" id="chatInput" placeholder="Nachricht eingeben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
-                    <button class="btn" onclick="sendChatMessage()">Senden</button>
-                </div>
+        <!-- CHAT -->
+        <div class="card">
+            <div class="card-title">FLÜCHTIGER RAM-CHAT</div>
+            <div class="chat-box" id="chatBox">
+                <div class="chat-msg system">System: Ultra-Fast High Priority Tunnel bereit.</div>
             </div>
-
-        </main>
+            <div class="input-group">
+                <input type="text" id="chatInput" placeholder="Nachricht eingeben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                <button class="btn" onclick="sendChatMessage()">SENDEN</button>
+            </div>
+        </div>
 
         <footer class="app-footer">
-            #NULLSEC • E2E DTLS-ENCRYPTED • NO LOGS • NO STORAGE
+            E2E ENCRYPTED • ZERO LOGS • DIRECT P2P TUNNEL
         </footer>
     </div>
 
     <script>
-        // ZERO-STORAGE GUARANTEE: Blockiert jeglichen Festplattenspeicher des Browsers
+        // ZERO-STORAGE GUARANTEE: Blockiert dauerhaftes Speichern auf dem Handy
         try {
             window.localStorage.clear();
             window.sessionStorage.clear();
@@ -368,38 +380,29 @@
         let mediaCall = null;
         let localStream = null;
 
-        const nodes = ["Frankfurt", "Zurich", "Amsterdam", "Stockholm", "Reykjavik", "Tokyo"];
-
-        function rotateVpn() {
-            const randomIp = `${Math.floor(Math.random() * 150 + 40)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
-            const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
-            document.getElementById('vpnIp').innerText = randomIp;
-            document.getElementById('vpnRoute').innerText = randomNode.toUpperCase();
-        }
-        setInterval(rotateVpn, 5000);
-        rotateVpn();
-
-        // 1. PeerJS mit High-Priority Google STUN Servern (Optimiert für Blitz-Verbindung)
+        // Blitz-Verbindung über Google & Cloudflare STUN Server
         function initPeer() {
             if(peer) peer.destroy();
             
-            const customId = "nullsec-" + Math.floor(100000 + Math.random() * 900000);
+            const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
+            const fullId = "nullsec-" + randomCode;
             
-            peer = new Peer(customId, {
+            peer = new Peer(fullId, {
                 debug: 0,
                 config: {
                     iceServers: [
                         { urls: 'stun:stun.l.google.com:19302' },
                         { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:stun2.l.google.com:19302' }
+                        { urls: 'stun:stun2.l.google.com:19302' },
+                        { urls: 'stun:stun.cloudflare.com:3478' }
                     ],
-                    iceCandidatePoolSize: 10 // Vorab-Pool für <1s Verbindungsaufbau
+                    iceCandidatePoolSize: 10 // Vorab-Verbindungs-Pool für Highspeed
                 }
             });
 
             peer.on('open', (id) => {
-                document.getElementById('myPeerId').innerText = id.replace('nullsec-', '');
-                logSystem(`Sicherer P2P-Tunnel bereit. ID: ${id.replace('nullsec-', '')}`);
+                document.getElementById('myPeerId').innerText = randomCode;
+                logSystem(`Sicherer Tunnel bereit. Code: ${randomCode}`);
             });
 
             peer.on('connection', (conn) => {
@@ -422,25 +425,24 @@
                         mediaCall = call;
                         logSystem("Anruf aktiv!");
                     } catch(err) {
-                        alert("Kamera/Mikrofon nicht erreichbar.");
+                        alert("Kamera/Mikrofon Zugriff verweigert.");
                     }
                 }
             });
 
             peer.on('error', (err) => {
-                logSystem(`Status: ${err.type}`);
+                logSystem(`Status: Verbindungs-Update...`);
             });
         }
 
-        // 2. Blitz-Verbindung zum Freund aufbauen
+        // Direktes Verbinden (Unter 1 Sekunde)
         function connectToPeer() {
             const inputVal = document.getElementById('targetPeerId').value.trim();
-            if(!inputVal) return alert("Gib den 6-stelligen Code ein!");
+            if(!inputVal || inputVal.length < 6) return alert("Gib den 6-stelligen Code ein!");
 
             const fullTargetId = "nullsec-" + inputVal;
-            logSystem(`Verbinde zu ${inputVal}...`);
+            logSystem(`Verbinde blitzschnell zu ${inputVal}...`);
             
-            // Verbindungsaufbau mit Low-Latency Option
             dataConn = peer.connect(fullTargetId, { reliable: true });
             setupChatListeners();
         }
@@ -455,7 +457,7 @@
             });
 
             dataConn.on('close', () => {
-                logSystem("Verbindung getrennt. RAM gesäubert.");
+                logSystem("Verbindung getrennt. Speicher gesäubert.");
             });
         }
 
@@ -469,7 +471,7 @@
                 addChatBubble(msg, 'me');
                 input.value = '';
             } else {
-                alert("Erst Code eingeben und auf 'Verbinden' drücken!");
+                alert("Erst Code eingeben und 'Verbinden' drücken!");
             }
         }
 
@@ -477,7 +479,7 @@
             const box = document.getElementById('chatBox');
             const div = document.createElement('div');
             div.className = `chat-msg ${sender}`;
-            div.innerText = (sender === 'me' ? 'Du: ' : 'Partner: ') + text;
+            div.innerText = text;
             box.appendChild(div);
             box.scrollTop = box.scrollHeight;
         }
@@ -511,7 +513,7 @@
 
                 logSystem("Anruf wird aufgebaut...");
             } catch(err) {
-                alert("Mikrofon oder Kamera konnte nicht aktiviert werden.");
+                alert("Kamera oder Mikrofon konnte nicht gestartet werden.");
             }
         }
 
