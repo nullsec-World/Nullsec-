@@ -354,7 +354,7 @@
                     <div class="chat-msg system">System: Bereit für verschlüsselte P2P Übertragung.</div>
                 </div>
                 <div class="input-group" style="margin-top: 10px;">
-                    <input type="text" id="chatInput" placeholder="Nachricht eingeben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
+                    <input type="text" id="chatInput" placeholder="Nachrichten eingeben..." onkeypress="if(event.key==='Enter') sendChatMessage()">
                     <button class="btn" onclick="sendChatMessage()">Senden</button>
                 </div>
             </div>
@@ -363,7 +363,7 @@
 
         <!-- FOOTER -->
         <footer class="app-footer">
-            #NULLSEC NETWORK • ZERO STORAGE • ALL DATA WIPED ON CLOSE
+            #NULLSEC NETWORK • POWERED BY GOOGLE GLOBAL STUN • ZERO STORAGE
         </footer>
     </div>
 
@@ -392,18 +392,30 @@
         setInterval(rotateVpn, 5000);
         rotateVpn();
 
-        // 1. PeerJS Initialisieren
+        // 1. PeerJS mit den weltgrößten kostenlosen Google STUN-Servern initialisieren
         function initPeer() {
             if(peer) peer.destroy();
             
             // Erstellt eine zufällige 6-stellige Zahl als ID
             const customId = "nullsec-" + Math.floor(100000 + Math.random() * 900000);
             
-            peer = new Peer(customId);
+            // Einbindung der schnellen Google-Infrastruktur für P2P-Verbindung
+            peer = new Peer(customId, {
+                config: {
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' },
+                        { urls: 'stun:stun2.l.google.com:19302' },
+                        { urls: 'stun:stun3.l.google.com:19302' },
+                        { urls: 'stun:stun4.l.google.com:19302' }
+                    ]
+                }
+            });
 
             peer.on('open', (id) => {
                 document.getElementById('myPeerId').innerText = id.replace('nullsec-', '');
                 logSystem(`Deine Anonyme ID erstellt: ${id.replace('nullsec-', '')}`);
+                logSystem(`Verbunden mit dem weltweiten Google STUN-Netzwerk.`);
             });
 
             // Wenn jemand UNS kontaktiert (Chat)
