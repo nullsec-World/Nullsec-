@@ -3,215 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>#NULLSEC • WhatsApp Speed Terminal</title>
-    
-    <!-- Superschnelles Messaging System -->
-    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
+    <title>WhatsApp E2EE Private Chat</title>
     <style>
         :root {
             --bg-dark: #0b141a;
             --panel-bg: #111b21;
             --neon-green: #00a884;
-            --text-main: #e9edef;
-            --text-muted: #8696a0;
             --msg-me: #005c4b;
             --msg-peer: #202c33;
-            --font-mono: 'JetBrains Mono', monospace;
+            --text-main: #e9edef;
+            --text-muted: #8696a0;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background: var(--bg-dark); color: var(--text-main); height: 100vh; display: flex; justify-content: center; }
 
         .app-container {
-            width: 100%;
-            max-width: 600px;
-            height: 100%;
-            background: var(--panel-bg);
-            display: flex;
-            flex-direction: column;
+            width: 100%; max-width: 500px; height: 100%; background: var(--panel-bg); display: flex; flex-direction: column;
         }
 
         .header {
-            padding: 14px 16px;
-            background: #202c33;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 14px 16px; background: #202c33; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
+        .title { color: var(--neon-green); font-weight: bold; font-size: 1.1rem; }
+        .badge { font-size: 0.65rem; background: rgba(0, 168, 132, 0.15); color: var(--neon-green); padding: 4px 8px; border-radius: 10px; font-weight: bold; }
 
-        .title { color: var(--neon-green); font-weight: 900; letter-spacing: 2px; }
-
-        .control-panel {
-            padding: 10px;
-            background: #111b21;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+        .config-box {
+            padding: 12px; background: #111b21; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-
         .row { display: flex; gap: 8px; }
-
         input {
-            flex: 1;
-            background: #2a3942;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            color: #fff;
-            outline: none;
-            font-size: 0.9rem;
+            flex: 1; background: #2a3942; border: none; padding: 10px 14px; border-radius: 8px; color: #fff; font-size: 0.9rem; outline: none;
+        }
+        button {
+            background: var(--neon-green); color: #111b21; border: none; padding: 10px 14px; border-radius: 8px; font-weight: bold; cursor: pointer;
         }
 
-        .btn {
-            background: var(--neon-green);
-            color: #111b21;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
+        .chat-area {
+            flex: 1; background: #0b141a; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
         }
-
-        /* RIESIGER WHATSAPP CHAT */
-        .chat-box {
-            flex: 1;
-            background: #0b141a;
-            padding: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
         .msg {
-            max-width: 80%;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            word-break: break-word;
-            line-height: 1.4;
+            max-width: 80%; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; word-break: break-word; line-height: 1.4;
         }
-
         .msg.me { background: var(--msg-me); align-self: flex-end; }
         .msg.peer { background: var(--msg-peer); align-self: flex-start; }
-        .msg.sys { background: rgba(255,255,255,0.05); color: var(--text-muted); align-self: center; font-size: 0.75rem; }
+        .msg.sys { background: rgba(255,255,255,0.05); color: var(--text-muted); align-self: center; font-size: 0.75rem; text-align: center; }
 
-        .input-bar {
-            padding: 12px;
-            background: #202c33;
-            display: flex;
-            gap: 10px;
-        }
-
+        .input-bar { padding: 10px; background: #202c33; display: flex; gap: 8px; }
         .input-bar input { border-radius: 20px; }
-        .send-btn { width: 45px; height: 45px; border-radius: 50%; background: var(--neon-green); border: none; font-size: 1.2rem; cursor: pointer; }
+        .send-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--neon-green); border: none; font-size: 1.1rem; cursor: pointer; flex-shrink: 0; }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <div class="header">
-            <div class="title">#NULLSEC MEGA-CHAT</div>
-            <div id="status" style="font-size: 0.75rem; color: var(--neon-green);">SOFORT-MODUS</div>
-        </div>
-
-        <div class="control-panel">
-            <div class="row">
-                <input type="text" id="myCode" readonly style="text-align: center; color: var(--neon-green); font-weight: bold;">
-                <button class="btn" onclick="copyCode()">KOPIEREN</button>
-            </div>
-            <div class="row">
-                <input type="text" id="targetCode" placeholder="Code vom Kolleg eingeben...">
-                <button class="btn" onclick="connect()">VERBINDEN</button>
-            </div>
-        </div>
-
-        <div class="chat-box" id="chatBox">
-            <div class="msg sys">Chat bereit. Gib den Code ein und drücke Verbinden!</div>
-        </div>
-
-        <div class="input-bar">
-            <input type="text" id="chatInput" placeholder="Nachricht schreiben..." onkeypress="if(event.key==='Enter') send()">
-            <button class="send-btn" onclick="send()">➤</button>
-        </div>
+<div class="app-container">
+    <div class="header">
+        <div class="title">🔐 E2EE CHAT</div>
+        <div class="badge" id="cryptoStatus">🔒 256-BIT ENCRYPTED</div>
     </div>
 
-    <script>
-        const myID = Math.floor(100000 + Math.random() * 900000).toString();
-        let targetID = "";
-        document.getElementById('myCode').value = "DEIN CODE: " + myID;
+    <div class="config-box">
+        <div class="row">
+            <input type="text" id="roomInput" placeholder="Gemeinsamen Raum-Namen eingeben...">
+            <input type="password" id="passInput" placeholder="Geheimer Schlüssel (Passwort)...">
+        </div>
+        <button onclick="startSession()">CHATTEN STARTEN</button>
+    </div>
 
-        // Ultra-Fast Global Broadcast Tunnel (< 0.5s Reaktionszeit)
-        function listenForMessages() {
-            const es = new EventSource(`https://ntfy.sh/nullsec_channel_${myID}/sse`);
-            es.onmessage = (e) => {
-                try {
-                    const data = JSON.parse(e.data);
-                    if (data.message) {
-                        const parsed = JSON.parse(data.message);
-                        if (parsed.sender !== myID) {
-                            addMsg(parsed.text, 'peer');
-                        }
-                    }
-                } catch(err) {}
-            };
-        }
+    <div class="chat-area" id="chatArea">
+        <div class="msg sys">Gib denselben Raum-Namen und das gleiche Passwort wie dein Partner ein.</div>
+    </div>
 
-        function connect() {
-            const input = document.getElementById('targetCode').value.trim();
-            if(input.length < 6) return alert("Gib den 6-stelligen Code ein!");
-            targetID = input;
-            document.getElementById('status').innerText = "VERBUNDEN MIT #" + targetID;
-            addMsg(`Verbindung zu #${targetID} steht!`, 'sys');
-        }
+    <div class="input-bar">
+        <input type="text" id="msgInput" placeholder="Verschlüsselte Nachricht..." onkeypress="if(event.key==='Enter') sendMsg()">
+        <button class="send-btn" onclick="sendMsg()">➤</button>
+    </div>
+</div>
 
-        function send() {
-            const input = document.getElementById('chatInput');
-            const txt = input.value.trim();
-            if(!txt) return;
+<script>
+    let room = "";
+    let cryptoKey = null;
+    let ws = null;
 
-            if(!targetID) {
-                alert("Gib oben erst den Code von deinem Kumpel ein!");
-                return;
+    // Erzeugt aus dem Passwort einen echten 256-Bit AES-GCM Crypto-Key im Handy-Speicher
+    async function deriveKey(password) {
+        const enc = new TextEncoder();
+        const keyMaterial = await crypto.subtle.importKey(
+            "raw", enc.encode(password), { name: "PBKDF2" }, false, ["deriveKey"]
+        );
+        return crypto.subtle.deriveKey(
+            {
+                name: "PBKDF2",
+                salt: enc.encode("NullSecSalt2026"),
+                iterations: 100000,
+                hash: "SHA-256"
+            },
+            keyMaterial,
+            { name: "AES-GCM", length: 256 },
+            false,
+            ["encrypt", "decrypt"]
+        );
+    }
+
+    async function startSession() {
+        const r = document.getElementById('roomInput').value.trim();
+        const p = document.getElementById('passInput').value.trim();
+
+        if (!r || !p) return alert("Bitte Raum und Geheim-Passwort eingeben!");
+
+        room = r;
+        cryptoKey = await deriveKey(p);
+
+        // Verbinde mit einem stabilen, weltweiten WebSocket Relay
+        if (ws) ws.close();
+        
+        // Öffentlicher Relay-Server, der von keinem Handy-Provider blockiert wird
+        ws = new WebSocket(`wss://free.piehost.com/v3/${encodeURIComponent(room)}?api_key=o75zS7U1G851wYwS8X09`);
+
+        ws.onopen = () => {
+            logSys(`Verbunden mit Raum "${room}". 1-zu-1 Verschlüsselung aktiv!`);
+        };
+
+        ws.onmessage = async (e) => {
+            try {
+                const data = JSON.parse(e.data);
+                if (data && data.ciphertext && data.iv) {
+                    const decrypted = await decryptMessage(data.ciphertext, data.iv);
+                    if (decrypted) addBubble(decrypted, 'peer');
+                }
+            } catch(err) {
+                // Nachrichten von anderen Räumen oder falschem Passwort ignorieren
             }
+        };
 
-            // Garantiert unter 1 Sekunde bei beiden Handys
-            fetch(`https://ntfy.sh/nullsec_channel_${targetID}`, {
-                method: 'POST',
-                body: JSON.stringify({ sender: myID, text: txt })
-            });
+        ws.onerror = () => logSys("Verbindungsfehler. Überprüfe dein Netz.");
+    }
 
-            addMsg(txt, 'me');
-            input.value = '';
+    async function encryptMessage(text) {
+        const enc = new TextEncoder();
+        const iv = crypto.getRandomValues(new Uint8Array(12));
+        const encrypted = await crypto.subtle.encrypt(
+            { name: "AES-GCM", iv: iv },
+            cryptoKey,
+            enc.encode(text)
+        );
+        return {
+            ciphertext: Array.from(new Uint8Array(encrypted)),
+            iv: Array.from(iv)
+        };
+    }
+
+    async function decryptMessage(ciphertext, iv) {
+        try {
+            const dec = new TextDecoder();
+            const decrypted = await crypto.subtle.decrypt(
+                { name: "AES-GCM", iv: new Uint8Array(iv) },
+                cryptoKey,
+                new Uint8Array(ciphertext)
+            );
+            return dec.decode(decrypted);
+        } catch(e) {
+            return null; // Falsches Passwort = Entschlüsselung schlägt fehl
+        }
+    }
+
+    async function sendMsg() {
+        const input = document.getElementById('msgInput');
+        const text = input.value.trim();
+
+        if (!text) return;
+        if (!cryptoKey || !ws || ws.readyState !== WebSocket.OPEN) {
+            return alert("Klicke zuerst auf 'CHATTEN STARTEN'!");
         }
 
-        function addMsg(text, type) {
-            const box = document.getElementById('chatBox');
-            const div = document.createElement('div');
-            div.className = `msg ${type}`;
-            div.innerText = text;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-        }
+        const payload = await encryptMessage(text);
+        ws.send(JSON.stringify(payload));
 
-        function copyCode() {
-            navigator.clipboard.writeText(myID);
-            alert("Dein Code wurde kopiert!");
-        }
+        addBubble(text, 'me');
+        input.value = '';
+    }
 
-        listenForMessages();
-    </script>
+    function addBubble(text, type) {
+        const box = document.getElementById('chatArea');
+        const div = document.createElement('div');
+        div.className = `msg ${type}`;
+        div.innerText = text;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    function logSys(text) {
+        const box = document.getElementById('chatArea');
+        const div = document.createElement('div');
+        div.className = 'msg sys';
+        div.innerText = text;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+    }
+</script>
+
 </body>
 </html>
